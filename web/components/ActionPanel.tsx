@@ -50,7 +50,7 @@ export function ActionPanel({ d, cfg, onChanged }: { d: CoinDetail; cfg: Config 
         <h2>Are you @{c.recipient}?</h2>
         <p className="muted">
           {d.is_chooser ? "You chose @" + c.recipient + ". " : ""}@{c.recipient} was chosen to receive this coin's creator fees. Log in with X to accept and choose where they
-          go: your wallet, or a nonprofit on donate.gg. You can also decline.
+          go: your wallet, or a nonprofit on donate.gg. You can also pass it on to another account, or decline.
           {deadline ? ` If nothing is set by ${deadline}, funds go to ${fallback}.` : ""}
         </p>
         <a className="btn btn-white" href={login(c.mint)}>
@@ -174,11 +174,11 @@ function ChooseRecipient({ d, fallback, deadline, onChanged }: { d: CoinDetail; 
           <label className="check" style={{ marginTop: 14 }}>
             <input type="checkbox" checked={sure} onChange={(e) => setSure(e.target.checked)} />
             <span>
-              Lock @{found.handle} as the recipient for ${c.symbol}. <b>This is permanent:</b> it can't be changed later, by you or anyone.
+              Select @{found.handle} as the recipient for ${c.symbol}. You can't change this later; @{found.handle} can accept it or pass it on.
             </span>
           </label>
           <button className="btn btn-green" style={{ marginTop: 14 }} disabled={!sure || busy} onClick={lock}>
-            {busy ? "Locking…" : `Lock @${found.handle} as recipient`}
+            {busy ? "Selecting…" : `Select @${found.handle} as recipient`}
           </button>
         </div>
       )}
@@ -193,7 +193,7 @@ function ChooseRecipient({ d, fallback, deadline, onChanged }: { d: CoinDetail; 
 function SetPayout({ d, cfg, fallback, deadline, onChanged }: { d: CoinDetail; cfg: Config | null; fallback: string; deadline: string | null; onChanged: () => void }) {
   const c = d.coin;
   const [sure, setSure] = useState(false);
-  const [tab, setTab] = useState<"wallet" | "nonprofit">("wallet");
+  const [tab, setTab] = useState<"wallet" | "nonprofit" | "someone">("wallet");
   const [wallet, setWallet] = useState<{ provider: Awaited<ReturnType<typeof connectWallet>>["provider"]; address: string } | null>(null);
   const [nonprofit, setNonprofit] = useState<string | null>(null);
   const [declining, setDeclining] = useState(false);
@@ -227,7 +227,7 @@ function SetPayout({ d, cfg, fallback, deadline, onChanged }: { d: CoinDetail; c
     <section className="panel dark" id="act">
       <h2>You were chosen to receive ${c.symbol}'s fees, @{d.me?.x_handle}</h2>
       <p className="muted">
-        {c.recipient_is_chooser ? "You chose yourself." : `@${c.honoree ?? "The chooser"} chose you.`} Choose where the funds go.{" "}
+        {c.recipient_is_chooser ? "You chose yourself." : `@${c.honoree ?? "The chooser"} chose you.`} Choose where the funds go, or pass them on.{" "}
         {cfg ? `This is the ${Math.round(cfg.charity_bps / 100)}% recipient share of the coin's creator fees, ` : "This is the recipient share of the coin's creator fees, "}
         paid in public transactions.
         {deadline ? ` If nothing is set by ${deadline}, funds go to ${fallback}.` : ""}
@@ -239,15 +239,22 @@ function SetPayout({ d, cfg, fallback, deadline, onChanged }: { d: CoinDetail; c
         <button role="tab" aria-selected={tab === "nonprofit"} onClick={() => setTab("nonprofit")}>
           A nonprofit
         </button>
+        <button role="tab" aria-selected={tab === "someone"} onClick={() => setTab("someone")}>
+          Someone else
+        </button>
       </div>
-      <label className="check" style={{ margin: "0 0 14px" }}>
-        <input type="checkbox" checked={sure} onChange={(e) => setSure(e.target.checked)} />
-        <span>
-          <b>This is permanent.</b> Once set, the destination for ${c.symbol}'s fees can't be changed.
-        </span>
-      </label>
+      {tab !== "someone" && (
+        <label className="check" style={{ margin: "0 0 14px" }}>
+          <input type="checkbox" checked={sure} onChange={(e) => setSure(e.target.checked)} />
+          <span>
+            <b>This is permanent.</b> Once set, the destination for ${c.symbol}'s fees can't be changed.
+          </span>
+        </label>
+      )}
 
-      {tab === "wallet" ? (
+      {tab === "someone" ? (
+        <PassOn d={d} onChanged={onChanged} />
+      ) : tab === "wallet" ? (
         <div>
           <p className="muted small">
             Funds are sent to your wallet as support. You'll sign a message to prove you own it: no transaction, no fee.
@@ -300,5 +307,72 @@ function SetPayout({ d, cfg, fallback, deadline, onChanged }: { d: CoinDetail; c
       )}
       {msg && <p className={msg.ok ? "ok" : "err"} role="status" style={{ marginTop: 12 }}>{msg.text}</p>}
     </section>
+  );
+}
+
+// ---------- the recipient passes it on ----------
+
+function PassOn({ d, onChanged }: { d: CoinDetail; onChanged: () => void }) {
+  const c = d.coin;
+  const [handle, setHandle] = useState("");
+  const [found, setFound] = useState<Lookup | null>(null);
+  const [looking, setLooking] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState<Msg>(null);
+  const clean = handle.trim().replace(/^@/, "");
+
+  useEffect(() => {
+    setFound(null);
+    if (!/^[A-Za-z0-9_]{1,15}$/.test(clean)) return;
+    setLooking(true);
+    const t = setTimeout(() => {
+      api<Lookup>(`/api/x/lookup?handle=${encodeURIComponent(clean)}`)
+        .then(setFound, (e: Error) => setMsg({ ok: false, text: e.message }))
+        .finally(() => setLooking(false));
+    }, 350);
+    return () => clearTimeout(t);
+  }, [clean]);
+
+  async function pass() {
+    setBusy(true);
+    setMsg(null);
+    try {
+      const r = await post<{ message: string }>(`/api/coins/${c.mint}/redirect`, { handle: found!.handle });
+      setMsg({ ok: true, text: r.message });
+      onChanged();
+    } catch (e) {
+      setMsg({ ok: false, text: (e as Error).message });
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  const self = found?.found && d.me && found.handle.toLowerCase() === d.me.x_handle.toLowerCase();
+  return (
+    <div>
+      <p className="muted small">
+        Pass ${c.symbol}'s fees to another X account instead: a friend, a project, a cause or a charity's account. @FeeFlowApp tags them, and they can accept, choose where
+        funds go, or pass it on again. You can also do this by replying to @FeeFlowApp with their @handle.
+      </p>
+      <input value={handle} onChange={(e) => setHandle(e.target.value)} placeholder="@handle" aria-label="X handle to pass it to" autoComplete="off" />
+      {looking && <p className="muted small" style={{ marginTop: 10 }}>Looking up @{clean}…</p>}
+      {found && !found.found && <p className="err" style={{ marginTop: 10 }}>@{clean} wasn't found on X.</p>}
+      {self && <p className="muted small" style={{ marginTop: 10 }}>That's you. To keep the fees, choose your wallet or a nonprofit above.</p>}
+      {found?.found && !self && (
+        <div className="confirm-box" style={{ marginTop: 14 }}>
+          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+            <Avatar src={found.avatar} label={found.handle} size={44} />
+            <div>
+              <b>{found.name ?? `@${found.handle}`}</b>
+              <div className="muted small">@{found.handle}</div>
+            </div>
+          </div>
+          <button className="btn btn-green" style={{ marginTop: 14 }} disabled={busy} onClick={pass}>
+            {busy ? "Passing on…" : `Pass to @${found.handle}`}
+          </button>
+        </div>
+      )}
+      {msg && <p className={msg.ok ? "ok" : "err"} role="status" style={{ marginTop: 12 }}>{msg.text}</p>}
+    </div>
   );
 }

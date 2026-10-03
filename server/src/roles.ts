@@ -2,7 +2,8 @@
  * Chooser → recipient → payout destination.
  *
  *  - Chooser: the X account a coin is named for (honoree_* columns). Picks the recipient, once.
- *  - Recipient: any X account, including the chooser. Locked permanently once picked.
+ *  - Recipient: any X account, including the chooser. The chooser can't change their pick, but the current
+ *    recipient can pass it on to another account until a payout destination is set.
  *  - Payout destination: the recipient's verified wallet, or a donate.gg nonprofit.
  *
  * Accounts are stored by stable X id; handles are for display and selection only.
@@ -58,10 +59,54 @@ export async function lockRecipient(
   const text = self
     ? fit(`@${c.honoree_handle} you selected yourself as $${c.symbol}'s recipient. Log in to choose where funds go, your wallet or a nonprofit: ${link(c.mint)}#act{0}`, until ? `\n\n${until}` : "")
     : fit(
-        `@${c.honoree_handle} selected @${user.username} as $${c.symbol}'s recipient.\n\n@${user.username}: log in to accept and choose your wallet or a nonprofit: ${link(c.mint)}#act{0}`,
+        `@${c.honoree_handle} selected @${user.username} as $${c.symbol}'s recipient.\n\n@${user.username}: log in to accept and choose your wallet or a nonprofit, or reply with another @handle to pass it on: ${link(c.mint)}#act{0}`,
         until ? `\n\n${until}` : ""
       );
   await coinPost(c.mint, "recipient_locked", text, reply?.tweetId ?? c.announce_tweet);
+  return getCoin(c.mint)!;
+}
+
+// ---------- the recipient passes it on ----------
+
+/** The current recipient hands the coin to another X account, before any payout destination is set. */
+export async function redirectRecipient(
+  c: Coin,
+  fromUserId: string,
+  user: XUser,
+  via: "site" | "x_reply",
+  reply: { tweetId: string } | null = null
+): Promise<Coin> {
+  const state = routingState(c);
+  if (state === "active") throw new RoleError(409, "This coin's payout destination is already set, so it can't be passed on.");
+  if (state !== "awaiting_routing" || c.recipient_user_id !== fromUserId) throw new RoleError(409, `Only $${c.symbol}'s current recipient can pass it on.`);
+  if (user.id === fromUserId) throw new RoleError(400, `@${user.username} is already $${c.symbol}'s recipient.`);
+  const from = c.recipient_handle;
+  // Only the current recipient, and only once: a race between the website and an X reply can't hand it on twice.
+  const res = db
+    .prepare(
+      `UPDATE coins SET recipient_user_id = ?, recipient_handle = ?, recipient_selected_at = ?, recipient_selected_via = ?, selection_tweet_id = ?, updated_at = ?
+       WHERE mint = ? AND recipient_user_id = ? AND payout_kind IS NULL AND released_at IS NULL AND recipient_declined_at IS NULL`
+    )
+    .run(user.id, user.username, now(), via, reply?.tweetId ?? null, now(), c.mint, fromUserId);
+  if (res.changes !== 1) throw new RoleError(409, `$${c.symbol}'s recipient just changed. Reload and try again.`);
+  db.prepare("INSERT OR REPLACE INTO honorees (user_id, handle, name, avatar, updated_at) VALUES (?, ?, ?, ?, ?)").run(user.id, user.username, user.name, user.avatar, now());
+  addEvent(c.mint, "recipient_redirected", {
+    actor_id: fromUserId,
+    actor_handle: from,
+    detail: `@${from} → @${user.username}, id ${user.id}`,
+    tweet_id: reply?.tweetId ?? null,
+  });
+  const by = deadline(c);
+  const until = by ? `Not set by ${by}? Funds go to ${fallbackName(c)}.` : "";
+  await coinPost(
+    c.mint,
+    "recipient_redirected",
+    fit(
+      `@${from} passed $${c.symbol}'s creator fees to @${user.username}.\n\n@${user.username}: log in to accept and choose your wallet or a nonprofit, or reply with another @handle to pass it on: ${link(c.mint)}#act{0}`,
+      until ? `\n\n${until}` : ""
+    ),
+    reply?.tweetId ?? c.announce_tweet
+  );
   return getCoin(c.mint)!;
 }
 
@@ -210,7 +255,9 @@ async function handleReply(m: Mention, botHandle: string) {
   if (!found) return logReply(m, null, "unrelated");
   const c = getCoin(found.mint);
   if (!c || c.status !== "live") return logReply(m, found.mint, "no_coin");
-  // Only the chooser's account can select. Matched by X id, never by handle.
+  // The current recipient can pass the coin on by replying with another @handle. Matched by X id.
+  if (c.recipient_user_id && m.author_id === c.recipient_user_id && routingState(c) === "awaiting_routing") return handleRecipientReply(m, c, botHandle, found.tagged);
+  // Otherwise only the chooser's account can select. Matched by X id, never by handle.
   if (m.author_id !== c.honoree_user_id) return logReply(m, c.mint, "not_chooser");
 
   const answer = (text: string, outcome: string) => (logReply(m, c.mint, outcome), coinPost(c.mint, "reply", text, m.id));
@@ -251,6 +298,32 @@ async function handleReply(m: Mention, botHandle: string) {
     await rememberHonoree(user!.id, user!.username).catch(() => {});
   } catch (e) {
     if (e instanceof RoleError) return answer(`@${c.honoree_handle} ${e.message}`, "rejected");
+    throw e;
+  }
+}
+
+async function handleRecipientReply(m: Mention, c: Coin, botHandle: string, tagged: string[]) {
+  const who = c.recipient_handle!;
+  const answer = (text: string, outcome: string) => (logReply(m, c.mint, outcome), coinPost(c.mint, "reply", text, m.id));
+  const p = parseSelection(m.text, botHandle, tagged, who);
+  if (p.kind === "self") return answer(`@${who} to accept $${c.symbol}'s creator fees, log in and choose your wallet or a nonprofit: ${link(c.mint)}#act`, "accept_hint");
+  if (p.kind === "clarify") {
+    if (p.reason === "none") return logReply(m, c.mint, "chatter");
+    return answer(`@${who} to pass $${c.symbol}'s creator fees on, reply with just one @handle. To accept them, log in: ${link(c.mint)}#act`, `clarify_${p.reason}`);
+  }
+  let user: XUser | null;
+  try {
+    user = await lookupUser(p.handle);
+  } catch {
+    return; // X didn't answer: leave it unlogged so the next poll tries again
+  }
+  if (!user) return answer(`@${who} we couldn't find @${p.handle} on X. Check the spelling and reply again with one @handle.`, "not_found");
+  try {
+    await redirectRecipient(c, m.author_id, user, "x_reply", { tweetId: m.id });
+    logReply(m, c.mint, "redirected");
+    await rememberHonoree(user.id, user.username).catch(() => {});
+  } catch (e) {
+    if (e instanceof RoleError) return answer(`@${who} ${e.message}`, "rejected");
     throw e;
   }
 }

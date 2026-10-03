@@ -12,7 +12,8 @@ const ROLE: Record<string, string> = {
 };
 
 const EVENT: Record<string, string> = {
-  recipient_locked: "Recipient locked",
+  recipient_locked: "Recipient selected",
+  recipient_redirected: "Passed on",
   payout_set: "Payout destination set",
   payout_changed: "Payout destination changed",
   recipient_declined: "Recipient declined",

@@ -14,7 +14,7 @@ import { botPost, finishLogin, lookupUser, startLogin } from "./x.js";
 import { pinMetadata } from "./metadata.js";
 import { ROUTER_ID, feeAdmin } from "./router.js";
 import { activate, buybackTotals, fmtUsd, solUsd, usd } from "./worker.js";
-import { RoleError, declineRecipient, lockRecipient, setPayout, walletChallenge } from "./roles.js";
+import { RoleError, declineRecipient, lockRecipient, redirectRecipient, setPayout, walletChallenge } from "./roles.js";
 
 
 const httpError = (statusCode: number, message: string) => Object.assign(new Error(message), { statusCode });
@@ -620,6 +620,22 @@ export async function buildServer() {
           : `@${user.username} is locked in as the recipient. They log in here to accept and choose where funds go.`,
       coin: publicCoin(after),
     };
+  });
+
+  /** The current recipient passes the coin on to another X account (before setting a destination). */
+  app.post("/api/coins/:mint/redirect", async (req) => {
+    const { me, c } = requireRecipient(req);
+    const b = z.object({ handle: z.string().trim().min(1) }).parse(req.body);
+    let user;
+    try {
+      user = await lookupUser(b.handle);
+    } catch {
+      throw httpError(503, "Couldn't reach X to check that handle. Try again in a minute.");
+    }
+    if (!user) throw httpError(400, `Couldn't find @${b.handle.replace(/^@/, "")} on X.`);
+    const after = await roles(() => redirectRecipient(c, me.x_user_id, user!, "site"));
+    auditCache.delete(c.mint);
+    return { ok: true, message: `Passed on to @${user.username}. They can accept, choose where funds go, or pass it on again.`, coin: publicCoin(after) };
   });
 
   /** A one-time message for the recipient's wallet to sign. */

@@ -15,10 +15,11 @@ export default function Disclosures() {
         wallet, so a chooser or recipient may receive money from a coin's fees. FeeFlow confirms control of an X account by X login only; it does not verify identity beyond that or
         anyone's nonprofit status. Labels such as "cause" or "foundation" don't mean a registered nonprofit. A chooser can remove their name from FeeFlow's site and posts.
       </p>
-      <h2>Permanent choices</h2>
+      <h2>Choices and changes</h2>
       <p>
-        A chosen recipient is locked permanently, whether chosen on the website or by an X reply; deleting the reply doesn't undo it. A recipient's payout destination is also
-        permanent once set. FeeFlow can't change either on anyone's behalf.
+        The chooser picks a recipient once, on the website or by an X reply, and can't change it; deleting the reply doesn't undo it. Until a payout destination is set, the
+        current recipient can pass the coin on to another X account, which can do the same; each pass is public. A payout destination is permanent once set. FeeFlow can't
+        make any of these choices on anyone's behalf.
       </p>
       <h2>Coins</h2>
       <p>

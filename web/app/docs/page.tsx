@@ -116,12 +116,12 @@ export default function Docs() {
         <H id="choosing" n={7}>Choosing the recipient</H>
         <p>The chooser picks one of two ways:</p>
         <ol className="steps-num">
-          <li><span><b>Reply on X</b>Reply to @FeeFlowApp's post about the coin with the recipient's @handle, or "me". FeeFlow checks the reply came from the chooser's account, matches it to the coin, looks the handle up, and replies naming the exact account it locked. A reply with several handles, a handle that doesn't exist or unclear wording gets a request to try again instead.</span></li>
+          <li><span><b>Reply on X</b>Reply to @FeeFlowApp's post about the coin with the recipient's @handle, or "me". FeeFlow checks the reply came from the chooser's account, matches it to the coin, looks the handle up, and replies naming the exact account it selected. A reply with several handles, a handle that doesn't exist or unclear wording gets a request to try again instead.</span></li>
           <li><span><b>On the website</b>Log in with X on the coin's page, type the handle, check the account it resolves to, and confirm. Useful for protected accounts, or if you'd rather not reply publicly.</span></li>
         </ol>
         <p>
-          <b>The choice is permanent.</b> Once a recipient is locked, nobody can replace it, including the chooser. Deleting a selection reply doesn't undo the choice or reverse
-          payouts. A reply chooses the recipient for that one coin only.
+          <b>The chooser picks once.</b> The chooser can't change their pick, but the recipient can pass it on (below). Deleting a selection reply doesn't undo the choice or
+          reverse payouts. A reply chooses the recipient for that one coin only.
         </p>
 
         <H id="routing" n={8}>Accepting and routing</H>
@@ -129,6 +129,7 @@ export default function Docs() {
         <dl className="facts">
           <dt>Their wallet</dt><dd>They connect it and sign a message proving they own it (no transaction, no fee). Payments are support, not donations.</dd>
           <dt>A nonprofit</dt><dd>Any nonprofit on donate.gg's onboarded list. donate.gg delivers it; the nonprofit doesn't need a FeeFlow account.</dd>
+          <dt>Pass it on</dt><dd>Reply to @FeeFlowApp with another account's @handle, or choose "Someone else" on the coin's page. That account becomes the recipient and can do the same. Each pass is in the coin's public record.</dd>
           <dt>Decline</dt><dd>Funds go to the fallback nonprofit instead.</dd>
         </dl>
         <p>
@@ -157,7 +158,7 @@ export default function Docs() {
         <H id="receipts" n={11}>Statuses, receipts and posts</H>
         <dl className="facts">
           <dt>Awaiting recipient selection</dt><dd>The chooser hasn't picked a recipient.</dd>
-          <dt>Awaiting recipient routing selection</dt><dd>The recipient is locked but hasn't accepted and chosen a destination.</dd>
+          <dt>Awaiting recipient routing selection</dt><dd>A recipient is selected but hasn't accepted and chosen a destination (or passed it on).</dd>
           <dt>Routing active</dt><dd>A payout destination is set.</dd>
           <dt>Recipient declined</dt><dd>The recipient said no; funds go to the fallback.</dd>
           <dt>Fallback activated</dt><dd>The fallback nonprofit is receiving the funds.</dd>

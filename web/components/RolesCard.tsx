@@ -37,7 +37,8 @@ export function RolesCard({ d }: { d: CoinDetail }) {
                 {c.recipient_is_chooser && <span className="badge">same as chooser</span>}
               </span>
               <small>
-                Locked permanently{c.recipient_selected_at ? ` on ${dateLong(c.recipient_selected_at)}` : ""} {via}.
+                Selected{c.recipient_selected_at ? ` on ${dateLong(c.recipient_selected_at)}` : ""} {via}.
+                {c.state === "awaiting_routing" ? " They can accept or pass it on to another account." : ""}
                 {c.selection_tweet ? (
                   <>
                     {" "}
