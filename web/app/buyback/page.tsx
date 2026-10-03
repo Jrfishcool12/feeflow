@@ -28,7 +28,7 @@ export default function Buyback() {
           <ol className="steps-num">
             <li><span><b>A share of every coin's fees</b>{cfg ? pct(cfg.buyback_bps) : "5%"} of creator fees, direct or relayed, goes to the buyback wallet.</span></li>
             <li><span><b>A random moment</b>Between 5 minutes and an hour after the last attempt, drawn fresh each time with cryptographic randomness.</span></li>
-            <li><span><b>Buy and burn</b>If the wallet holds at least 0.05 SOL, it buys the FeeFlow coin and burns every token it bought.</span></li>
+            <li><span><b>Buy and burn</b>Once the wallet can spend at least 0.05 SOL (it holds about 0.058 SOL, leaving room for slippage and fees), it buys the FeeFlow coin and burns every token it bought.</span></li>
           </ol>
           <p className="muted small">
             The coin gates nothing: holding it doesn't change any split or give any rights. {data?.platform_coin ? <a href={pumpCoin(data.platform_coin)} target="_blank" rel="noopener">See it on Pump.fun</a> : null}
