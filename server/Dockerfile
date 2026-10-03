@@ -9,4 +9,5 @@ ENV NODE_ENV=production DB_PATH=/data/goodcall.db PORT=8787
 # SQLite lives in /data: attach a persistent volume there (Railway: a Volume mounted at /data).
 # No VOLUME line: Railway rejects it and uses its own volumes.
 EXPOSE 8787
-CMD ["npx", "tsx", "src/index.ts"]
+# Run node directly (not through npm/npx), so a normal stop on redeploy exits cleanly instead of looking like a crash.
+CMD ["node", "--import", "tsx", "src/index.ts"]
