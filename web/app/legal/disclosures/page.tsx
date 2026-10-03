@@ -46,6 +46,11 @@ export default function Disclosures() {
         The FeeFlow coin gates nothing: holding it gives no rights, no share of fees, no vote and no claim on FeeFlow. The buyback is a published mechanism, not a promise of value. FeeFlow
         may change or stop it.
       </p>
+      <h2>FeeFlow wallets</h2>
+      <p>
+        Logging in with X can create a FeeFlow wallet: a Solana wallet provided by Privy. FeeFlow can't see, move or recover what's in it, and can't restore access if you lose
+        your X account; you can export its key to another wallet at any time. Once exported, keeping the key safe is up to you. FeeFlow doesn't hold funds in these wallets.
+      </p>
       <h2>Software</h2>
       <p>FeeFlow relies on Solana, Pump.fun and donate.gg, any of which can fail, change or pause. Smart contracts and software can contain bugs.</p>
     </Legal>

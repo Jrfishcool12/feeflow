@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Wordmark } from "./Wordmark";
 import { useApi, type Config } from "@/lib/api";
+import { sol, useBalance, useFeeFlowWallet } from "@/lib/feeflowWallet";
 
 const P: Record<string, React.ReactNode> = {
   home: <path d="M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3z" />,
@@ -27,6 +28,13 @@ const P: Record<string, React.ReactNode> = {
     </>
   ),
   menu: <path d="M4 7h16M4 12h16M4 17h16" />,
+  wallet: (
+    <>
+      <path d="M4 7.5A2.5 2.5 0 0 1 6.5 5H18a1 1 0 0 1 1 1v2" />
+      <path d="M4 7.5v9A2.5 2.5 0 0 0 6.5 19H20V9H6.5A2.5 2.5 0 0 1 4 7.5z" />
+      <circle cx="16" cy="14" r="1.2" />
+    </>
+  ),
 };
 
 function Icon({ name }: { name: string }) {
@@ -58,6 +66,8 @@ export function Sidebar() {
   const path = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const cfg = useApi<Config>("/api/config").data;
+  const ffw = useFeeFlowWallet();
+  const { lamports } = useBalance(ffw.address);
   const [copied, setCopied] = useState(false);
   const ca = cfg?.platform_coin ?? null;
   const ticker = cfg?.platform_coin_symbol ? `$${cfg.platform_coin_symbol}` : "FeeFlow coin";
@@ -128,6 +138,24 @@ export function Sidebar() {
           ))}
         </nav>
         <div className="spacer" />
+        {ffw.ready && (
+          <div className="sb-wallet">
+            {ffw.authenticated ? (
+              <Link href="/wallet" className="sb-link" aria-current={active("/wallet") ? "page" : undefined} title={collapsed ? `Wallet: ${sol(lamports)}` : undefined}>
+                <Icon name="wallet" />
+                <span className="sb-label">
+                  <small>{ffw.handle ? `@${ffw.handle}` : "Your wallet"}</small>
+                  <b className="mono">{sol(lamports)}</b>
+                </span>
+              </Link>
+            ) : (
+              <button className="sb-link" onClick={ffw.login} title={collapsed ? "Log in with X" : undefined}>
+                <Icon name="x" />
+                <span className="sb-label">Log in with X</span>
+              </button>
+            )}
+          </div>
+        )}
         {ca && (
           <div className="sb-ca">
             <button className="sb-link sb-ca-btn" onClick={copyCa} title={collapsed ? `Copy official ${ticker} address` : `Copy ${ca}`}>

@@ -10,9 +10,12 @@
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.3.0",
+    "@privy-io/react-auth": "^3.47.0",
+    "@solana-program/memo": "^0.10.0",
     "@solana/web3.js": "^1.99.0",
     "geist": "^1.7.2",
     "next": "^15.5.27",
+    "qrcode": "^1.5.4",
     "react": "^19.3.0",
     "react-dom": "^19.3.0"
   },

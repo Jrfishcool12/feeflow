@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { api, post, type CoinDetail, type Config } from "@/lib/api";
 import { connectWallet, signText } from "@/lib/wallet";
 import { dateLong } from "@/lib/roles";
+import { useFeeFlowWallet } from "@/lib/feeflowWallet";
 import { NonprofitPicker } from "./NonprofitPicker";
 import { Avatar } from "./Avatar";
 
@@ -197,6 +198,7 @@ function SetPayout({ d, cfg, fallback, deadline, onChanged }: { d: CoinDetail; c
   const [wallet, setWallet] = useState<{ provider: Awaited<ReturnType<typeof connectWallet>>["provider"]; address: string } | null>(null);
   const [nonprofit, setNonprofit] = useState<string | null>(null);
   const [declining, setDeclining] = useState(false);
+  const ffw = useFeeFlowWallet();
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<Msg>(null);
 
@@ -260,9 +262,20 @@ function SetPayout({ d, cfg, fallback, deadline, onChanged }: { d: CoinDetail; c
             Funds are sent to your wallet as support. You'll sign a message to prove you own it: no transaction, no fee.
           </p>
           {!wallet ? (
-            <button className="btn btn-white" disabled={busy} onClick={() => connectWallet().then(setWallet, (e: Error) => setMsg({ ok: false, text: e.message }))}>
-              Connect wallet
-            </button>
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+              {ffw.authenticated && ffw.address && ffw.provider ? (
+                <button className="btn btn-white" disabled={busy} onClick={() => setWallet({ provider: ffw.provider!, address: ffw.address! })}>
+                  Use my FeeFlow wallet
+                </button>
+              ) : (
+                <button className="btn btn-white" disabled={busy || !ffw.ready} onClick={ffw.login}>
+                  Create a FeeFlow wallet
+                </button>
+              )}
+              <button className="btn btn-ghost" disabled={busy} onClick={() => connectWallet().then(setWallet, (e: Error) => setMsg({ ok: false, text: e.message }))}>
+                Connect another wallet
+              </button>
+            </div>
           ) : (
             <div className="confirm-box">
               <div className="muted small">Funds will be sent to</div>

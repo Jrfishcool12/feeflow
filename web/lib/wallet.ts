@@ -1,7 +1,7 @@
 "use client";
 import { VersionedTransaction } from "@solana/web3.js";
 
-type Provider = {
+export type Provider = {
   connect: () => Promise<{ publicKey?: { toString(): string } } | void>;
   publicKey?: { toString(): string } | null;
   signTransaction: (tx: VersionedTransaction) => Promise<VersionedTransaction>;

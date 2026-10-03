@@ -1,11 +1,11 @@
 import Fastify from "fastify";
 import fastifyCookie from "@fastify/cookie";
 import { randomBytes, randomUUID } from "node:crypto";
-import { ComputeBudgetProgram, Keypair, PublicKey, TransactionMessage, VersionedMessage, VersionedTransaction } from "@solana/web3.js";
+import { ComputeBudgetProgram, Keypair, PublicKey, SystemProgram, TransactionMessage, VersionedMessage, VersionedTransaction } from "@solana/web3.js";
 import { z } from "zod";
 import { CHARITY_BPS, FALLBACK_CONFIG, PLATFORM_COIN, cfg, LAMPORTS, RELAY_ON } from "./config.js";
 import { db, getCharity, getCoin, isHolding, now, routingState, updateCoin, type Charity, type Coin } from "./db.js";
-import { authority, buybackWallet, isWallet, submit } from "./chain.js";
+import { authority, buybackWallet, conn, isWallet, submit } from "./chain.js";
 import { auditLive, buildLaunch, checkHouse, switchCharity, verifyRelayRouting } from "./pump.js";
 import { LINE_TEMPLATE, checkCoin, coinFallback, fallbackConfigId, forwardCoin, heldBalance, relayPending, treasury, waitingFor } from "./relay.js";
 import { accruedFees, getHonoree, readTokenMeta } from "./market.js";
@@ -454,6 +454,64 @@ export async function buildServer() {
   });
 
   // ----- launch -----
+
+  // ---------- FeeFlow wallets (Privy embedded wallets): balance, withdrawals ----------
+  // Keys never touch this server: it reads balances, builds unsigned transfers, and relays transactions
+  // the user's own wallet has already signed.
+  const toKey = (s: string) => {
+    try {
+      return new PublicKey(s);
+    } catch {
+      throw httpError(400, "That isn't a Solana address.");
+    }
+  };
+  const balances = new Map<string, { at: number; lamports: number }>();
+  app.get("/api/wallet/:address", async (req) => {
+    const key = toKey((req.params as { address: string }).address).toBase58();
+    const hit = balances.get(key);
+    if (hit && Date.now() - hit.at < 10_000) return { address: key, lamports: hit.lamports };
+    const lamports = await conn.getBalance(new PublicKey(key), "confirmed");
+    balances.set(key, { at: Date.now(), lamports });
+    return { address: key, lamports };
+  });
+
+  const TX_FEE = 5_000;
+  const RENT_MIN = 890_880; // the least a Solana account can hold
+  app.post("/api/wallet/withdraw", async (req) => {
+    if (!allow(`wallet:${req.ip}`, 60)) throw httpError(429, "Too many requests. Try again in a few minutes.");
+    const b = z.object({ from: z.string(), to: z.string().trim(), lamports: z.coerce.number().int().positive().optional(), max: z.boolean().optional() }).parse(req.body);
+    const from = toKey(b.from);
+    const to = toKey(b.to);
+    if (from.equals(to)) throw httpError(400, "That's this same wallet.");
+    const balance = await conn.getBalance(from, "confirmed");
+    const lamports = b.max ? balance - TX_FEE : b.lamports ?? 0;
+    if (lamports <= 0 || lamports + TX_FEE > balance) throw httpError(400, "Not enough SOL for that amount plus the network fee.");
+    const rest = balance - lamports - TX_FEE;
+    if (rest > 0 && rest < RENT_MIN) throw httpError(400, "That would leave less than 0.00089 SOL behind, which Solana doesn't allow. Send a little less, or use Max.");
+    const { blockhash } = await conn.getLatestBlockhash("confirmed");
+    const msg = new TransactionMessage({ payerKey: from, recentBlockhash: blockhash, instructions: [SystemProgram.transfer({ fromPubkey: from, toPubkey: to, lamports })] }).compileToV0Message();
+    return { tx: Buffer.from(new VersionedTransaction(msg).serialize()).toString("base64"), lamports };
+  });
+
+  /** Sends a transaction the user's wallet has already fully signed. FeeFlow adds nothing to it. */
+  app.post("/api/wallet/send", async (req) => {
+    if (!allow(`wallet:${req.ip}`, 60)) throw httpError(429, "Too many requests. Try again in a few minutes.");
+    const { tx } = z.object({ tx: z.string() }).parse(req.body);
+    let signed: VersionedTransaction;
+    try {
+      signed = VersionedTransaction.deserialize(Buffer.from(tx, "base64"));
+    } catch {
+      throw httpError(400, "That isn't a valid transaction.");
+    }
+    if (signed.signatures.some((s) => s.every((x) => x === 0))) throw httpError(400, "The transaction isn't fully signed.");
+    try {
+      const signature = await submit(signed);
+      for (const k of signed.message.staticAccountKeys) balances.delete(k.toBase58());
+      return { signature };
+    } catch (e) {
+      throw httpError(400, `The transaction didn't go through: ${(e as Error).message}`);
+    }
+  });
 
   /** @FeeFlowApp's post about a coin, for the coin's X link. */
   app.get("/api/coins/:mint/post", async (req) => {

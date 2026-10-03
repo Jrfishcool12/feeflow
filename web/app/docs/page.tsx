@@ -72,7 +72,7 @@ export default function Docs() {
         <H id="direct" n={3}>Launching on FeeFlow</H>
         <ol className="steps-num">
           <li><span><b>Fill in the coin</b>Name, ticker, image and the X account to tag, on the <Link href="/launch">launch page</Link>.</span></li>
-          <li><span><b>Sign in your wallet</b>Your wallet signs the Pump.fun launch.</span></li>
+          <li><span><b>Sign the launch</b>Log in with X and your FeeFlow wallet signs it, or use Phantom or another Solana wallet. Either way, only your wallet signs the Pump.fun launch.</span></li>
           <li><span><b>Routing switches on</b>Seconds later, fee sharing is set: the recipient share is held in the FeeFlow treasury, and the FeeFlow and buyback shares go out as usual. The coin page shows the split checked on-chain, and @FeeFlowApp tags that account on X.</span></li>
         </ol>
         <p>You don't earn creator fees from a FeeFlow coin. A dev buy is optional.</p>
@@ -195,6 +195,7 @@ export default function Docs() {
           <dt>Support</dt><dd>A payout to a recipient's wallet.</dd>
           <dt>Donation</dt><dd>A payout to a nonprofit through donate.gg.</dd>
           <dt>Treasury</dt><dd>Where the recipient share is held until a destination is set, and where relayed coins send fees.</dd>
+          <dt>FeeFlow wallet</dt><dd>A Solana wallet created when you log in with X, provided by Privy. Use it to launch and receive payouts; only you can use it, and you can export its key.</dd>
           <dt>Fallback nonprofit</dt><dd>Where funds go if the recipient declines or no destination is set within 90 days.</dd>
           <dt>Fee sharing</dt><dd>Pump.fun's setting that splits creator fees across up to ten addresses.</dd>
         </dl>

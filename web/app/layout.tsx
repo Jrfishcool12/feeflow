@@ -4,6 +4,7 @@ import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 import { Sidebar } from "@/components/Sidebar";
 import { Footer } from "@/components/Footer";
+import { Providers } from "@/components/Providers";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.SITE_URL ?? "http://localhost:3000"),
@@ -24,11 +25,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: SIDEBAR_STATE }} />
       </head>
       <body>
-        <Sidebar />
-        <div className="app">
-          <main id="main">{children}</main>
-          <Footer />
-        </div>
+        <Providers>
+          <Sidebar />
+          <div className="app">
+            <main id="main">{children}</main>
+            <Footer />
+          </div>
+        </Providers>
       </body>
     </html>
   );
