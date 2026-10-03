@@ -34,7 +34,7 @@ export async function lockRecipient(
   via: "site" | "x_reply",
   reply: { tweetId: string } | null = null
 ): Promise<Coin> {
-  if (c.recipient_user_id) throw new RoleError(409, `$${c.symbol}'s recipient is already locked: @${c.recipient_handle}. It can't be changed.`);
+  if (c.recipient_user_id) throw new RoleError(409, `$${c.symbol}'s recipient is already selected: @${c.recipient_handle}.`);
   if (c.released_at) throw new RoleError(409, `$${c.symbol}'s recipient share already goes to ${fallbackName(c)}, so a recipient can't be chosen anymore.`);
   // Guard against a race between the website and an X reply: only the first one wins.
   const res = db
@@ -43,7 +43,7 @@ export async function lockRecipient(
        WHERE mint = ? AND recipient_user_id IS NULL AND released_at IS NULL`
     )
     .run(user.id, user.username, now(), via, reply?.tweetId ?? null, now(), c.mint);
-  if (res.changes !== 1) throw new RoleError(409, `$${c.symbol}'s recipient was just locked by another request.`);
+  if (res.changes !== 1) throw new RoleError(409, `$${c.symbol}'s recipient was just selected by another request.`);
   db.prepare("INSERT OR REPLACE INTO honorees (user_id, handle, name, avatar, updated_at) VALUES (?, ?, ?, ?, ?)").run(user.id, user.username, user.name, user.avatar, now());
   const self = user.id === c.honoree_user_id;
   addEvent(c.mint, "recipient_locked", {
@@ -56,9 +56,9 @@ export async function lockRecipient(
   const by = deadline(c);
   const until = by ? `Not set by ${by}? Funds go to ${fallbackName(c)}.` : "";
   const text = self
-    ? fit(`@${c.honoree_handle} you're locked in as $${c.symbol}'s recipient. Log in to choose where funds go, your wallet or a nonprofit: ${link(c.mint)}#act{0}`, until ? `\n\n${until}` : "")
+    ? fit(`@${c.honoree_handle} you selected yourself as $${c.symbol}'s recipient. Log in to choose where funds go, your wallet or a nonprofit: ${link(c.mint)}#act{0}`, until ? `\n\n${until}` : "")
     : fit(
-        `@${c.honoree_handle} locked @${user.username} as $${c.symbol}'s recipient. This is permanent.\n\n@${user.username}: log in to accept and choose your wallet or a nonprofit: ${link(c.mint)}#act{0}`,
+        `@${c.honoree_handle} selected @${user.username} as $${c.symbol}'s recipient.\n\n@${user.username}: log in to accept and choose your wallet or a nonprofit: ${link(c.mint)}#act{0}`,
         until ? `\n\n${until}` : ""
       );
   await coinPost(c.mint, "recipient_locked", text, reply?.tweetId ?? c.announce_tweet);
@@ -142,7 +142,7 @@ export async function setPayout(c: Coin, xUserId: string, input: PayoutInput): P
   await coinPost(
     c.mint,
     "payout_set",
-    `@${c.recipient_handle} accepted $${c.symbol}'s fees${amount ? `. ${amount} was just sent to ${dest}` : ` and chose ${dest}`}. Future creator fees go there too; this is permanent. ${link(c.mint)}`,
+    `@${c.recipient_handle} accepted $${c.symbol}'s fees${amount ? `. ${amount} was just sent to ${dest}` : ` and chose ${dest}`}. Future creator fees go there too. ${link(c.mint)}`,
     c.announce_tweet
   );
   return { coin: getCoin(c.mint)!, sent };
@@ -218,15 +218,15 @@ async function handleReply(m: Mention, botHandle: string) {
 
   if (c.recipient_user_id) {
     if (p.kind === "clarify" && p.reason === "none") return logReply(m, c.mint, "chatter");
-    return answer(`@${c.honoree_handle} $${c.symbol}'s recipient is already locked: @${c.recipient_handle}. It can't be changed.`, "already_locked");
+    return answer(`@${c.honoree_handle} $${c.symbol}'s recipient is already selected: @${c.recipient_handle}.`, "already_locked");
   }
   if (c.released_at) return answer(`@${c.honoree_handle} $${c.symbol}'s recipient share already goes to ${fallbackName(c)}, so a recipient can't be chosen anymore.`, "closed");
 
   if (p.kind === "clarify") {
     const ask = {
-      none: `@${c.honoree_handle} to choose who receives $${c.symbol}'s creator fees, reply with one @handle, or "me" for yourself. The choice is permanent. You can also choose here: ${link(c.mint)}#act`,
-      multiple: `@${c.honoree_handle} that reply names more than one account. Reply with just one @handle to choose $${c.symbol}'s recipient (or "me"). The choice is permanent.`,
-      ambiguous: `@${c.honoree_handle} we couldn't tell who you meant. Reply with only the @handle of $${c.symbol}'s recipient, or "me" for yourself. The choice is permanent.`,
+      none: `@${c.honoree_handle} to choose who receives $${c.symbol}'s creator fees, reply with one @handle, or "me" for yourself. You can also choose here: ${link(c.mint)}#act`,
+      multiple: `@${c.honoree_handle} that reply names more than one account. Reply with just one @handle to choose $${c.symbol}'s recipient (or "me").`,
+      ambiguous: `@${c.honoree_handle} we couldn't tell who you meant. Reply with only the @handle of $${c.symbol}'s recipient, or "me" for yourself.`,
     }[p.reason];
     return answer(ask, `clarify_${p.reason}`);
   }

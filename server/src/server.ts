@@ -205,13 +205,14 @@ export async function buildServer() {
     const mint = String((req.params as any).file).replace(/\.png$/, "");
     const c = getCoin(mint);
     if (!c || c.status !== "live") throw httpError(404, "No coin with that address here.");
-    const hit = cardCache.get(mint);
+    const key = `${mint}:${routingState(c)}:${c.image ? 1 : 0}:${c.donated_lamports}`;
+    const hit = cardCache.get(key);
     let png = hit && Date.now() - hit.at < 600_000 ? hit.png : null;
     if (!png) {
       const holding = isHolding(c);
       png = await cardFor(c, holding ? "waiting" : "sent", fmtUsd(await usd(holding ? waitingFor(c) : c.donated_lamports)));
       if (!png) throw httpError(503, "Couldn't draw the card right now.");
-      cardCache.set(mint, { at: Date.now(), png });
+      cardCache.set(key, { at: Date.now(), png });
     }
     return reply.type("image/png").header("cache-control", "public, max-age=600").send(png);
   });

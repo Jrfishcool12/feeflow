@@ -1,6 +1,6 @@
 import { randomInt } from "node:crypto";
 import { LAMPORTS, MIN_FORWARD, PLATFORM_COIN, RELAY_ON, VAULT_RESERVE, cfg } from "./config.js";
-import { addDonation, configHistory, coinsByStatus, db, getCharity, isHolding, kvGet, kvSet, now, routingState, updateCoin, type Coin } from "./db.js";
+import { addDonation, configHistory, coinsByStatus, db, getCharity, getCoin, isHolding, kvGet, kvSet, now, routingState, updateCoin, type Coin } from "./db.js";
 import { buybackWallet, conn } from "./chain.js";
 import { coinFallback, distributeRelayed, forwardCoin, relayTotal, releaseExpired, scanTreasury, syncClaims, waitingFor } from "./relay.js";
 import { refreshMarket, rememberHonoree } from "./market.js";
@@ -42,6 +42,9 @@ export async function activate(c: Coin) {
       .run(c.mint, c.config_id, sig, now());
     // The deployed router routes straight to the fallback nonprofit (holding needs router v2).
     updateCoin(c.mint, { status: "live", error: null, ...(routerOn() ? { released_at: now() } : {}) });
+    // Art and profile picture first, so the post's link preview shows them.
+    await refreshMarket(getCoin(c.mint)!).catch(() => {});
+    await rememberHonoree(c.honoree_user_id, c.honoree_handle).catch(() => {});
     const id = await coinPost(
       c.mint,
       "announce",
@@ -75,7 +78,7 @@ async function heldMilestone(c: Coin) {
     "milestone",
     state === "awaiting_routing"
       ? `@${c.recipient_handle} ${fmtUsd(dollars)} from $${c.symbol} creator fees is waiting for you. Log in to accept and choose your wallet or a nonprofit: ${link(c.mint)}#act`
-      : `@${c.honoree_handle} ${fmtUsd(dollars)} from $${c.symbol} creator fees is waiting for a recipient. Reply with their @handle (or "me"), or choose at ${link(c.mint)}#act. The choice is permanent.`,
+      : `@${c.honoree_handle} ${fmtUsd(dollars)} from $${c.symbol} creator fees is waiting for a recipient. Reply with their @handle (or "me"), or choose at ${link(c.mint)}#act.`,
     c.announce_tweet,
     await cardFor(c, "waiting", fmtUsd(dollars))
   );
