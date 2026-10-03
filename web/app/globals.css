@@ -933,3 +933,7 @@ html[data-sb="collapsed"] .sb-ca-btn { padding: 0 !important; height: 40px !impo
 .chip-row { display: flex; flex-wrap: wrap; gap: 6px; }
 .mini-chip { font-size: 12.5px; padding: 5px 10px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--line); color: var(--strong); white-space: nowrap; }
 .fake-field span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* ---------- launch form: coin links row ---------- */
+.form .three { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+@media (max-width: 760px) { .form .three { grid-template-columns: 1fr; } }

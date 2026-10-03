@@ -75,6 +75,21 @@ function publicCoin(c: Coin) {
   };
 }
 
+/** "@name", "name", "x.com/name" or a full link → a full https link (null if empty). */
+function socialLink(v: string | undefined, base: string, field: string): string | undefined {
+  const s = (v ?? "").trim();
+  if (!s) return undefined;
+  if (base !== "https://" && /^@?[A-Za-z0-9_]{1,32}$/.test(s)) return `${base}${s.replace(/^@/, "")}`;
+  const url = /^https?:\/\//i.test(s) ? s : `https://${s}`;
+  try {
+    const u = new URL(url);
+    if (!u.hostname.includes(".")) throw new Error();
+    return u.toString();
+  } catch {
+    throw Object.assign(new Error(`That ${field} link doesn't look right.`), { statusCode: 400 });
+  }
+}
+
 const LaunchBody = z.object({
   deployer: z.string().refine(isWallet, "Connect a Solana wallet first."),
   name: z.string().trim().min(1).max(32),
@@ -83,6 +98,10 @@ const LaunchBody = z.object({
   image: z.string().optional(),
   uri: z.string().url().optional(),
   honoree: z.string().trim().min(1),
+  // The coin's own links, shown on Pump.fun like any coin's. All optional.
+  twitter: z.string().trim().max(200).optional(),
+  website: z.string().trim().max(200).optional(),
+  telegram: z.string().trim().max(200).optional(),
   dev_buy_sol: z.coerce.number().min(0).max(50).default(0),
 });
 
@@ -411,7 +430,15 @@ export async function buildServer() {
     let uri = b.uri;
     if (!uri) {
       if (!b.image) throw httpError(400, "Add an image or paste a metadata URI.");
-      uri = await pinMetadata({ name: b.name, symbol: b.symbol, description, imageDataUrl: b.image });
+      uri = await pinMetadata({
+        name: b.name,
+        symbol: b.symbol,
+        description,
+        imageDataUrl: b.image,
+        twitter: socialLink(b.twitter, "https://x.com/", "X"),
+        website: socialLink(b.website, "https://", "website"),
+        telegram: socialLink(b.telegram, "https://t.me/", "Telegram"),
+      });
     }
 
     const built = await buildLaunch({

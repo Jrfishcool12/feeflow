@@ -31,6 +31,9 @@ export function LaunchForm({ cfg }: { cfg: Config | null }) {
         symbol: f.get("symbol"),
         description: f.get("description"),
         honoree: f.get("honoree"),
+        twitter: f.get("twitter") || undefined,
+        website: f.get("website") || undefined,
+        telegram: f.get("telegram") || undefined,
         dev_buy_sol: f.get("dev_buy_sol") || 0,
       };
       const image = f.get("image");
@@ -80,6 +83,20 @@ export function LaunchForm({ cfg }: { cfg: Config | null }) {
           <input name="uri" type="url" required />
         </label>
       )}
+      <div className="three">
+        <label>
+          Coin's X page <span className="hint">Optional</span>
+          <input name="twitter" placeholder="x.com/yourcoin or @yourcoin" autoComplete="off" />
+        </label>
+        <label>
+          Website <span className="hint">Optional</span>
+          <input name="website" placeholder="yourcoin.com" autoComplete="off" />
+        </label>
+        <label>
+          Telegram <span className="hint">Optional</span>
+          <input name="telegram" placeholder="t.me/yourcoin" autoComplete="off" />
+        </label>
+      </div>
       <label>
         X account to tag <span className="hint">Any X account. They choose who receives the coin's creator fees: themselves or any account they want to support. Tagging them isn't an endorsement.</span>
         <input name="honoree" required placeholder="@elonmusk" />

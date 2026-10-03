@@ -14,18 +14,22 @@ function readImage(imageDataUrl: string) {
  * Uploads the coin image and its Pump.fun-style metadata JSON to IPFS. Returns the metadata URI.
  * Uses Pinata when PINATA_JWT is set; otherwise Pump.fun's own upload endpoint (no account needed).
  */
-export async function pinMetadata(p: { name: string; symbol: string; description: string; imageDataUrl: string }) {
+type Meta = { name: string; symbol: string; description: string; twitter?: string; website?: string; telegram?: string };
+
+export async function pinMetadata(p: Meta & { imageDataUrl: string }) {
   const { bytes, type, ext } = readImage(p.imageDataUrl);
   return cfg.PINATA_JWT ? viaPinata(p, bytes, type, ext) : viaPump(p, bytes, type, ext);
 }
 
-async function viaPump(p: { name: string; symbol: string; description: string }, bytes: Buffer, type: string, ext: string) {
+async function viaPump(p: Meta, bytes: Buffer, type: string, ext: string) {
   const form = new FormData();
   form.append("file", new Blob([new Uint8Array(bytes)], { type }), `${p.symbol}.${ext}`);
   form.append("name", p.name);
   form.append("symbol", p.symbol);
   form.append("description", p.description);
-  form.append("website", cfg.PUBLIC_URL);
+  form.append("website", p.website ?? cfg.PUBLIC_URL);
+  if (p.twitter) form.append("twitter", p.twitter);
+  if (p.telegram) form.append("telegram", p.telegram);
   form.append("showName", "true");
   const r = await fetch("https://pump.fun/api/ipfs", { method: "POST", body: form });
   if (!r.ok) throw new Error(`Image upload failed (${r.status}). Try again, or set PINATA_JWT in .env.`);
@@ -34,7 +38,7 @@ async function viaPump(p: { name: string; symbol: string; description: string },
   return j.metadataUri;
 }
 
-async function viaPinata(p: { name: string; symbol: string; description: string }, bytes: Buffer, type: string, ext: string) {
+async function viaPinata(p: Meta, bytes: Buffer, type: string, ext: string) {
   const auth = { Authorization: `Bearer ${cfg.PINATA_JWT}` };
   const form = new FormData();
   form.append("file", new Blob([new Uint8Array(bytes)], { type }), `${p.symbol}.${ext}`);
@@ -52,7 +56,9 @@ async function viaPinata(p: { name: string; symbol: string; description: string 
         description: p.description,
         image: `https://ipfs.io/ipfs/${imageHash}`,
         showName: true,
-        website: cfg.PUBLIC_URL,
+        website: p.website ?? cfg.PUBLIC_URL,
+        ...(p.twitter ? { twitter: p.twitter } : {}),
+        ...(p.telegram ? { telegram: p.telegram } : {}),
       },
     }),
   });
