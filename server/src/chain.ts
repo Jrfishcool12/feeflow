@@ -39,12 +39,25 @@ export async function send(ixs: TransactionInstruction[], units: number | null =
   return submit(tx, blockhash, lastValidBlockHeight);
 }
 
-export async function submit(tx: VersionedTransaction, blockhash?: string, lastValidBlockHeight?: number) {
-  const sig = await conn.sendRawTransaction(tx.serialize(), { maxRetries: 3 });
-  const bh = blockhash && lastValidBlockHeight ? { blockhash, lastValidBlockHeight } : await conn.getLatestBlockhash("confirmed");
-  const res = await conn.confirmTransaction({ signature: sig, ...bh }, "confirmed");
-  if (res.value.err) throw new Error(`Transaction ${sig} failed: ${JSON.stringify(res.value.err)}`);
-  return sig;
+/**
+ * Sends a signed transaction and waits for it to confirm. Confirmation is checked over plain HTTP
+ * (RPC providers rate-limit websocket subscriptions), re-sending every few seconds until it lands or
+ * its blockhash expires.
+ */
+export async function submit(tx: VersionedTransaction, _blockhash?: string, lastValidBlockHeight?: number) {
+  const raw = tx.serialize();
+  const sig = await conn.sendRawTransaction(raw, { maxRetries: 3 });
+  const expiry = lastValidBlockHeight ?? (await conn.getLatestBlockhash("confirmed")).lastValidBlockHeight;
+  for (let i = 0; ; i++) {
+    await new Promise((r) => setTimeout(r, 1500));
+    const st = (await conn.getSignatureStatuses([sig])).value[0];
+    if (st?.err) throw new Error(`Transaction ${sig} failed: ${JSON.stringify(st.err)}`);
+    if (st?.confirmationStatus === "confirmed" || st?.confirmationStatus === "finalized") return sig;
+    if (i % 4 === 3) {
+      if ((await conn.getBlockHeight("confirmed")) > expiry) throw new Error(`Transaction ${sig} expired before it confirmed`);
+      await conn.sendRawTransaction(raw, { skipPreflight: true, maxRetries: 0 }).catch(() => {});
+    }
+  }
 }
 
 /** The FeeFlow treasury: holds donations until honorees choose, and receives relayed coins' fees. */
