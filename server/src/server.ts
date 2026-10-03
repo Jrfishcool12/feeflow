@@ -81,7 +81,7 @@ function publicCoin(c: Coin) {
  * signed launch differs from the one we built, or null if every instruction we built is there unchanged,
  * with the same payer and signers, and the only extras are compute-budget or Lighthouse instructions.
  */
-const LIGHTHOUSE = "L2TExMFKdjpN9kozasaurPPUCZRVw7aYMV5hD2V8fCg";
+const LIGHTHOUSE = "L2TExMFKdjpN9kozasaurPirfHy9P8sbXoAN1qA3S95";
 const BUDGET = ComputeBudgetProgram.programId.toBase58();
 export function launchMismatch(builtB64: string, signed: VersionedTransaction): string | null {
   if (Buffer.from(signed.message.serialize()).toString("base64") === builtB64) return null;
