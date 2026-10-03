@@ -37,16 +37,16 @@ export function XThread() {
         <a>@yourname</a> you were tagged on $COIN. Choose who gets its creator fees: you, a friend, a project, a cause or a charity.
         <br />
         <br />
-        Reply with one @handle (or "me"). Permanent.
+        Reply with one @handle (or "me") or use feeflow.io/c/…
       </Post>
       <Post handle="yourname" name="You" reply="@FeeFlowApp">
         <a>@FeeFlowApp</a> <a>@theirpick</a>
       </Post>
       <Post bot handle="FeeFlowApp" name="FeeFlow" reply="@yourname">
-        <a>@yourname</a> locked <a>@theirpick</a> as $COIN's recipient. This is permanent.
+        <a>@yourname</a> selected <a>@theirpick</a> as $COIN's recipient.
         <br />
         <br />
-        <a>@theirpick</a>: log in to accept and choose your wallet or a nonprofit.
+        <a>@theirpick</a>: log in to accept and choose your wallet or a nonprofit, or reply with another @handle to pass it on.
       </Post>
       <Post bot handle="FeeFlowApp" name="FeeFlow">
         <a>@theirpick</a> the first payout from $COIN creator fees just landed in your wallet. Receipt: feeflow.io/c/…

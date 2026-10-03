@@ -7,8 +7,8 @@ Live at [feeflow.io](https://feeflow.io) · [@FeeFlowApp](https://x.com/FeeFlowA
 ## How it works
 
 1. **Launch.** A coin is launched on Pump.fun through FeeFlow and tags an X account (the *chooser*). [@FeeFlowApp](https://x.com/FeeFlowApp) tags them on X.
-2. **Choose.** The chooser replies to @FeeFlowApp with one @handle (or "me"), or picks on the coin's page after logging in with X. That account becomes the *recipient*, permanently.
-3. **Claim.** The recipient logs in with X and chooses a *payout destination*, once: their own wallet (proven with a signed message) or a nonprofit on [donate.gg](https://donate.gg).
+2. **Choose.** The chooser replies to @FeeFlowApp with one @handle (or "me"), or picks on the coin's page after logging in with X. That account becomes the *recipient*.
+3. **Claim or pass it on.** The recipient logs in with X and chooses a *payout destination*, once: their own wallet (proven with a signed message) or a nonprofit on [donate.gg](https://donate.gg). Or they pass the fees on to another X account (reply with its @handle), which gets the same choice.
 4. **Paid.** Creator fees are collected and paid out automatically. Every payout appears on the coin's page and in the public feed with its transaction, and @FeeFlowApp posts a receipt.
 
 If the recipient declines, or no destination is set within 90 days, the recipient share goes to the fallback nonprofit shown on the coin's page.

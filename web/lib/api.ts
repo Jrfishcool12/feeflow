@@ -13,7 +13,7 @@ export type Coin = {
   honoree_name: string | null;
   honoree_avatar: string | null;
   registered_via: "site" | "indexer";
-  /** Recipient: the X account the chooser locked in. */
+  /** Recipient: the X account currently chosen to receive the fees (the chooser's pick, or whoever it was passed to). */
   recipient: string | null;
   recipient_name: string | null;
   recipient_avatar: string | null;

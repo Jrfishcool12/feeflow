@@ -175,13 +175,14 @@ export default function Home() {
               </li>
               <li>
                 <span>
-                  <b>They reply with one @handle, or "me"</b>That account becomes the recipient, permanently. They can also choose on the coin's page if they'd rather not reply in
+                  <b>They reply with one @handle, or "me"</b>That account becomes the recipient. They can also choose on the coin's page if they'd rather not reply in
                   public.
                 </span>
               </li>
               <li>
                 <span>
-                  <b>The recipient gets tagged to claim</b>They log in with X and choose their own wallet or a nonprofit on donate.gg. Once.
+                  <b>The recipient accepts or passes it on</b>They log in with X and choose their own wallet or a nonprofit on donate.gg, or reply with another @handle to pass the
+                  fees on.
                 </span>
               </li>
               <li>

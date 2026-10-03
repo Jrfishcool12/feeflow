@@ -3,7 +3,7 @@ import type { Coin, RoutingState } from "./api";
 /**
  * One vocabulary for every page, card and receipt:
  *  - Chooser: the X account a coin is named for. Picks the recipient, once.
- *  - Recipient: any X account, including the chooser. Locked permanently once picked.
+ *  - Recipient: any X account, including the chooser. Can accept, decline, or pass it on to another account.
  *  - Payout destination: the recipient's verified wallet, or a nonprofit on donate.gg.
  * Wallet payouts are "support"; donate.gg payouts are "donations".
  */
