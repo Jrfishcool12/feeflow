@@ -1,0 +1,18 @@
+node_modules/
+.next/
+.vercel/
+.railway/
+target/
+.anchor/
+test-ledger/
+*.tsbuildinfo
+*.log
+
+# secrets and data: never commit
+.env
+.env.*
+!.env.example
+*.db
+*.db-*
+*keypair*.json
+id.json

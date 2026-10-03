@@ -1,0 +1,44 @@
+{
+  "name": "goodcall",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "GoodCall: memecoins that give their creator fees to verified nonprofits in someone's name.",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start": "tsx src/index.ts",
+    "typecheck": "tsc --noEmit",
+    "charity": "tsx src/cli.ts",
+    "router": "tsx src/router-cli.ts",
+    "doctor": "tsx src/doctor.ts",
+    "house": "tsx src/house.ts"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@fastify/cookie": "^11.1.2",
+    "@fastify/static": "^10.1.5",
+    "@fontsource/inter": "^5.3.0",
+    "@pump-fun/pump-sdk": "^2.0.0",
+    "@pump-fun/pump-swap-sdk": "^1.20.0",
+    "@resvg/resvg-js": "^2.6.2",
+    "@solana/spl-token": "^0.4.15",
+    "@solana/web3.js": "^1.99.0",
+    "better-sqlite3": "^13.0.3",
+    "bn.js": "^5.2.5",
+    "bs58": "^6.0.0",
+    "dotenv": "^18.0.5",
+    "fastify": "^5.12.5",
+    "satori": "^0.34.1",
+    "twitter-api-v2": "^1.29.1",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^9.6.0",
+    "@types/bn.js": "^5.2.0",
+    "@types/node": "^26.6.3",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3"
+  }
+}

@@ -1,0 +1,12 @@
+[toolchain]
+
+[features]
+resolution = true
+skip-lint = false
+
+[programs.mainnet]
+goodcall_router = "H1ATxqNn5Dc8dwMAKykZEae1mgd61Gq5UWt9JtKvJ2u6"
+
+[provider]
+cluster = "mainnet"
+wallet = "~/.config/solana/id.json"
