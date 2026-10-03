@@ -1,7 +1,7 @@
 import Fastify from "fastify";
 import fastifyCookie from "@fastify/cookie";
 import { randomBytes, randomUUID } from "node:crypto";
-import { Keypair, PublicKey, VersionedTransaction } from "@solana/web3.js";
+import { ComputeBudgetProgram, Keypair, PublicKey, TransactionMessage, VersionedMessage, VersionedTransaction } from "@solana/web3.js";
 import { z } from "zod";
 import { CHARITY_BPS, FALLBACK_CONFIG, PLATFORM_COIN, cfg, LAMPORTS, RELAY_ON } from "./config.js";
 import { db, getCharity, getCoin, isHolding, now, routingState, updateCoin, type Charity, type Coin } from "./db.js";
@@ -73,6 +73,33 @@ function publicCoin(c: Coin) {
     donated_lamports: c.donated_lamports,
     created_at: c.created_at,
   };
+}
+
+/**
+ * Wallets may add their own safety checks before signing (Phantom adds Lighthouse assertion
+ * instructions and can adjust the priority fee). Those are fine; anything else is not. Returns why the
+ * signed launch differs from the one we built, or null if every instruction we built is there unchanged,
+ * with the same payer and signers, and the only extras are compute-budget or Lighthouse instructions.
+ */
+const LIGHTHOUSE = "L2TExMFKdjpN9kozasaurPPUCZRVw7aYMV5hD2V8fCg";
+const BUDGET = ComputeBudgetProgram.programId.toBase58();
+export function launchMismatch(builtB64: string, signed: VersionedTransaction): string | null {
+  if (Buffer.from(signed.message.serialize()).toString("base64") === builtB64) return null;
+  if (signed.message.addressTableLookups?.length) return "the wallet added address lookup tables";
+  const builtMsg = VersionedMessage.deserialize(Buffer.from(builtB64, "base64"));
+  const ours = TransactionMessage.decompile(builtMsg);
+  const theirs = TransactionMessage.decompile(signed.message);
+  if (!theirs.payerKey.equals(ours.payerKey)) return "the fee payer changed";
+  const signers = (m: VersionedMessage) => m.staticAccountKeys.slice(0, m.header.numRequiredSignatures).map((k) => k.toBase58()).sort().join(",");
+  if (signers(signed.message) !== signers(builtMsg)) return "the signers changed";
+  const sig = (ix: TransactionMessage["instructions"][number]) =>
+    JSON.stringify([ix.programId.toBase58(), ix.keys.map((k) => [k.pubkey.toBase58(), k.isSigner]), Buffer.from(ix.data).toString("base64")]);
+  const a = ours.instructions.filter((ix) => ix.programId.toBase58() !== BUDGET).map(sig);
+  const extra = theirs.instructions.filter((ix) => ![BUDGET, LIGHTHOUSE].includes(ix.programId.toBase58()));
+  const b = extra.map(sig);
+  if (a.length === b.length && a.every((x, i) => x === b[i])) return null;
+  const unknown = [...new Set(extra.map((ix) => ix.programId.toBase58()).filter((p) => !ours.instructions.some((o) => o.programId.toBase58() === p)))];
+  return unknown.length ? `the wallet added instructions for ${unknown.join(", ")}` : "the launch instructions changed";
 }
 
 /** "@name", "name", "x.com/name" or a full link → a full https link (null if empty). */
@@ -462,7 +489,12 @@ export async function buildServer() {
     if (!c || c.status !== "built") throw httpError(404, "That launch expired. Start again.");
     const signed = VersionedTransaction.deserialize(Buffer.from(tx, "base64"));
     // The wallet may only add its signature; any change to what we built is rejected.
-    if (Buffer.from(signed.message.serialize()).toString("base64") !== c.built_message) throw httpError(400, "The signed transaction doesn't match the one we built.");
+    // The wallet may add its own safety checks; any change to what we built is rejected.
+    const mismatch = launchMismatch(c.built_message!, signed);
+    if (mismatch) {
+      console.error(`launch ${mint} rejected: ${mismatch}`);
+      throw httpError(400, `The signed transaction doesn't match the one we built (${mismatch}). Start again.`);
+    }
     if (!c.built_mint_secret) throw httpError(404, "That launch expired. Start again.");
     // The wallet signed first; now add the new coin's own signature.
     signed.sign([Keypair.fromSecretKey(Buffer.from(c.built_mint_secret, "base64"))]);
