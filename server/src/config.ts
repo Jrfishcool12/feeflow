@@ -15,6 +15,8 @@ const Env = z.object({
   BUYBACK_MAX_SECONDS: z.coerce.number().int().min(60).default(3600),
   // The platform's coin. Defaults to HOUSE_MINT.
   PLATFORM_COIN_MINT: z.string().optional().transform((v) => v || undefined),
+  // The coin shown in the home page's hero card. Empty: the top coin is picked automatically.
+  FEATURED_COIN_MINT: z.string().optional().transform((v) => v || undefined),
   CHANGE_COOLDOWN_DAYS: z.coerce.number().int().min(0).default(30),
   PINATA_JWT: opt,
 

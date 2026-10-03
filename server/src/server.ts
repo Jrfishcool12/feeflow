@@ -205,6 +205,7 @@ export async function buildServer() {
     buyback_bps: cfg.BUYBACK_BPS,
     platform_coin: PLATFORM_COIN ?? null,
     platform_coin_symbol: await platformCoinSymbol(),
+    featured_coin: cfg.FEATURED_COIN_MINT ?? null,
     buyback_wallet: buybackWallet.publicKey.toBase58(),
     buybacks: buybackTotals(),
     fallback: charityInfo(fallbackConfigId()),

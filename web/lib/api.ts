@@ -75,6 +75,7 @@ export type Config = {
   buyback_bps: number;
   platform_coin: string | null;
   platform_coin_symbol?: string | null;
+  featured_coin?: string | null;
   buyback_wallet: string;
   buybacks: { lamports: number; n: number };
   fallback: Nonprofit | null;

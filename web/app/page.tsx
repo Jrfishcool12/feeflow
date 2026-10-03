@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef, useState } from "react";
-import { useApi, type Coin, type Config, type Donation, type Honoree, type NonprofitStats, type Stats } from "@/lib/api";
+import { useApi, type Coin, type CoinDetail, type Config, type Donation, type Honoree, type NonprofitStats, type Stats } from "@/lib/api";
 import { ago, compact, money, pct } from "@/lib/format";
 import { SplitBar } from "@/components/SplitBar";
 import { DonationFeed } from "@/components/DonationFeed";
@@ -100,8 +100,15 @@ export default function Home() {
   const fmt = (n: number) => money(Math.round(n), usd);
   const series = stats?.series ?? [];
   const maxS = Math.max(1, ...series.map((p) => p.lamports));
-  const top = list.find((c) => c.honoree) ?? list[0];
-  const topDonation = top ? recent?.donations.find((d) => d.mint === top.mint) : undefined;
+  // Hero card: the featured coin when one is set on the server, otherwise the top coin. Waits for the
+  // settings first, so the card doesn't flash one coin and then switch to another.
+  const featuredMint = cfg?.featured_coin ?? null;
+  const featuredRes = useApi<CoinDetail>(featuredMint ? `/api/coins/${featuredMint}` : null);
+  const featuredPay = useApi<{ donations: Donation[] }>(featuredMint ? `/api/donations?mint=${featuredMint}&limit=1` : null).data;
+  const featured = featuredRes.data?.coin.status === "live" ? featuredRes.data.coin : undefined;
+  const autoTop = list.find((c) => c.honoree) ?? list[0];
+  const top = !cfg ? undefined : featuredMint && !featuredRes.error ? featured : autoTop;
+  const topDonation = !top ? undefined : top === featured ? featuredPay?.donations[0] : recent?.donations.find((d) => d.mint === top.mint);
 
   return (
     <>
