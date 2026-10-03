@@ -143,6 +143,20 @@ const allow = (ip: string, max: number) => {
 
 const auditCache = new Map<string, { at: number; value: unknown }>();
 
+/**
+ * Switches on a just-launched coin's fee routing. The RPC often doesn't see a brand-new coin for a few
+ * seconds, so retry every 10 seconds for two minutes (the worker keeps retrying after that).
+ */
+async function activateSoon(mint: string) {
+  for (let i = 0; i < 12; i++) {
+    const c = getCoin(mint);
+    if (!c || c.status !== "launched") return;
+    await activate(c).catch(() => {});
+    if (getCoin(mint)?.status === "live") return;
+    await new Promise((r) => setTimeout(r, 10_000));
+  }
+}
+
 /** The platform coin's ticker, read once from its own metadata. */
 let platformSymbol: { mint: string; symbol: string | null } | null = null;
 async function platformCoinSymbol(): Promise<string | null> {
@@ -506,7 +520,7 @@ export async function buildServer() {
       throw httpError(400, `The launch transaction failed: ${(e as Error).message}`);
     }
     updateCoin(mint, { status: "launched", launch_sig: sig, built_message: null, built_mint_secret: null });
-    activate(getCoin(mint)!).catch(() => {}); // worker retries if this fails
+    void activateSoon(mint);
     return { mint, signature: sig };
   });
 
