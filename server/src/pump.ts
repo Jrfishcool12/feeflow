@@ -66,8 +66,8 @@ export async function readSharing(mint: PublicKey) {
  * authority as creator, plus an optional dev buy. We sign as the new mint; the deployer
  * signs as payer. Returns the message so the server can check the signed copy matches.
  */
-export async function buildLaunch(p: { deployer: PublicKey; name: string; symbol: string; uri: string; devBuyLamports: number }) {
-  const mint = Keypair.generate();
+export async function buildLaunch(p: { deployer: PublicKey; name: string; symbol: string; uri: string; devBuyLamports: number; mint?: Keypair }) {
+  const mint = p.mint ?? Keypair.generate();
   const common = { mint: mint.publicKey, name: p.name, symbol: p.symbol, uri: p.uri, creator: feeAdmin(), user: p.deployer, mayhemMode: false };
   let ixs;
   if (p.devBuyLamports > 0) {

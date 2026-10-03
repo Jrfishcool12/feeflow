@@ -86,7 +86,7 @@ export function LaunchForm({ cfg }: { cfg: Config | null }) {
       <div className="three">
         <label>
           Coin's X page <span className="hint">Optional</span>
-          <input name="twitter" placeholder="x.com/yourcoin or @yourcoin" autoComplete="off" />
+          <input name="twitter" placeholder="Default: our post about your coin" autoComplete="off" />
         </label>
         <label>
           Website <span className="hint">Optional</span>

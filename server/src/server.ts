@@ -454,6 +454,12 @@ export async function buildServer() {
 
   // ----- launch -----
 
+  /** @FeeFlowApp's post about a coin, for the coin's X link. */
+  app.get("/api/coins/:mint/post", async (req) => {
+    const c = getCoin((req.params as { mint: string }).mint);
+    return { tweet: c?.announce_tweet ?? null };
+  });
+
   app.post("/api/launch/build", async (req) => {
     if (!allow(req.ip, 15)) throw httpError(429, "Too many launches from this connection. Try again in an hour.");
     const b = LaunchBody.parse(req.body);
@@ -469,6 +475,8 @@ export async function buildServer() {
       `Fees via ${cfg.PUBLIC_URL.replace(/^https?:\/\//, "")}: @${honoree.username} chooses who receives 90% of this coin's creator fees (any X account, including themselves)${cfg.HOLD_DAYS ? `; unclaimed after ${cfg.HOLD_DAYS} days go to ${charity.name}` : ""}. @${honoree.username} has not endorsed this coin.`,
     ].filter(Boolean).join("\n\n");
 
+    // The coin's address is chosen up front, so its metadata can link to things named after it.
+    const mintKp = Keypair.generate();
     let uri = b.uri;
     if (!uri) {
       if (!b.image) throw httpError(400, "Add an image or paste a metadata URI.");
@@ -477,7 +485,8 @@ export async function buildServer() {
         symbol: b.symbol,
         description,
         imageDataUrl: b.image,
-        twitter: socialLink(b.twitter, "https://x.com/", "X"),
+        // No X page given: link to @FeeFlowApp's post about this coin (via a redirect, since the post comes after launch).
+        twitter: socialLink(b.twitter, "https://x.com/", "X") ?? `${cfg.PUBLIC_URL}/x/${mintKp.publicKey.toBase58()}`,
         website: socialLink(b.website, "https://", "website"),
         telegram: socialLink(b.telegram, "https://t.me/", "Telegram"),
       });
@@ -489,6 +498,7 @@ export async function buildServer() {
       symbol: b.symbol,
       uri,
       devBuyLamports: Math.round(b.dev_buy_sol * LAMPORTS),
+      mint: mintKp,
     });
     const t = now();
     db.prepare(
