@@ -267,8 +267,8 @@ export default function Home() {
               <div className="tile-body">
                 <div className="fake-label">Tag an X account</div>
                 <div className="fake-field">
-                  <Avatar src={honorees?.honorees[0]?.avatar ?? null} label={honorees?.honorees[0]?.handle ?? "anyone"} size={22} />
-                  <b>@{honorees?.honorees[0]?.handle ?? "anyone"}</b>
+                  <Avatar src={null} label="elonmusk" size={22} />
+                  <b>@elonmusk</b>
                 </div>
                 <div className="fake-label">They choose who gets the fees</div>
                 <div className="chip-row">
