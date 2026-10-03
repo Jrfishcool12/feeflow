@@ -179,7 +179,8 @@ export const buybackTotals = () =>
 
 async function buyback() {
   if (!PLATFORM_COIN || cfg.BUYBACK_BPS === 0) return;
-  const spendable = (await conn.getBalance(buybackWallet.publicKey, "confirmed")) - BUYBACK_RESERVE;
+  // The buy can take up to 5% more than the amount it's given (slippage), so spend a little under what's available.
+  const spendable = Math.floor(((await conn.getBalance(buybackWallet.publicKey, "confirmed")) - BUYBACK_RESERVE) / 1.06);
   if (spendable < MIN_BUYBACK) return;
 
   const r = await buyAndBurn(PLATFORM_COIN, buybackWallet, spendable);
