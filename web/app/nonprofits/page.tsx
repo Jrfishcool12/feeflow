@@ -12,7 +12,7 @@ export default function Nonprofits() {
     <div className="wrap" style={{ paddingBottom: 96 }}>
       <div className="page-head">
         <h1>Nonprofits</h1>
-        <p className="sub">Nonprofits a recipient can route to, from donate.gg's list of onboarded organizations. donate.gg delivers donations and charges a processing fee; FeeFlow doesn't separately verify them.</p>
+        <p className="sub">Nonprofits a recipient can route to, from donate.gg's list of onboarded organizations. donate.gg delivers donations and charges a processing fee; Feeward doesn't separately verify them.</p>
       </div>
       <div className="toolbar">
         <input style={{ maxWidth: 360 }} value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search nonprofits" aria-label="Search nonprofits" />

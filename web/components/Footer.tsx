@@ -12,8 +12,8 @@ export function Footer() {
     <footer className="site-footer">
       <div className="wrap footer-grid">
         <div>
-          <Wordmark />
-          <p>Transparent funding from coin creator fees. The account tagged on a coin chooses who receives them, and every payout is public.</p>
+          <Wordmark tone="light" />
+          <p>Creator fees, paid forward. The account tagged on a coin chooses who receives them, and every payout has a public receipt.</p>
         </div>
         <div className="footer-cols">
           {cols.map((c) => (
@@ -29,11 +29,11 @@ export function Footer() {
         </div>
         <div className="fine">
           <span>
-            © {new Date().getFullYear()} FeeFlow. Not affiliated with X Corp., Pump.fun, donate.gg or the nonprofits listed. Being tagged on a coin or chosen as its recipient isn't an
+            © {new Date().getFullYear()} Feeward. Not affiliated with X Corp., Pump.fun, donate.gg or the nonprofits listed. Being tagged on a coin or chosen as its recipient isn't an
             endorsement. Coins are speculative.
           </span>
           <span className="social">
-            <a href="https://x.com/FeeFlowApp" target="_blank" rel="noopener">
+            <a href="https://x.com/feewardx" target="_blank" rel="noopener">
               X
             </a>
             <a href="https://github.com/Jrfishcool12/feeflow" target="_blank" rel="noopener">

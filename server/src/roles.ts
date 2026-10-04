@@ -126,7 +126,7 @@ export function walletChallenge(c: Coin, xUserId: string, wallet: string) {
   db.prepare("DELETE FROM wallet_challenges WHERE created_at < ?").run(now() - CHALLENGE_TTL);
   const nonce = randomBytes(16).toString("hex");
   const message = [
-    "FeeFlow payout wallet",
+    "Feeward payout wallet",
     "",
     `X account: @${c.recipient_handle} (id ${c.recipient_user_id})`,
     `Coin: $${c.symbol} (${c.mint})`,
@@ -328,7 +328,7 @@ async function handleRecipientReply(m: Mention, c: Coin, botHandle: string, tagg
   }
 }
 
-/** Reads new replies to @FeeFlowApp and acts on recipient selections. */
+/** Reads new replies to @feewardx and acts on recipient selections. */
 export async function pollReplies() {
   if (!botEnabled()) return;
   const acct = await botAccount();

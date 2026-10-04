@@ -16,7 +16,7 @@ export function Header() {
   return (
     <header className="site-header">
       <div className="wrap">
-        <Link href="/" className="brand" aria-label="FeeFlow home">
+        <Link href="/" className="brand" aria-label="Feeward home">
           <Wordmark />
         </Link>
         <nav aria-label="Main">
@@ -26,8 +26,8 @@ export function Header() {
             </Link>
           ))}
         </nav>
-        <a className="xlink" href="https://x.com/FeeFlowApp" target="_blank" rel="noopener">
-          @FeeFlowApp
+        <a className="xlink" href="https://x.com/feewardx" target="_blank" rel="noopener">
+          @feewardx
         </a>
         <Link href="/launch" className="btn btn-sm btn-white">
           Launch

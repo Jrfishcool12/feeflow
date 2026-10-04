@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { TreasuryAddress } from "@/components/TreasuryAddress";
 
-export const metadata: Metadata = { title: "Docs", description: "How FeeFlow routes a coin's creator fees: the account tagged on a coin chooses a recipient, who chooses their wallet or a nonprofit." };
+export const metadata: Metadata = { title: "Docs", description: "How Feeward routes a coin's creator fees: the account tagged on a coin chooses a recipient, who chooses their wallet or a nonprofit." };
 
 const toc: [string, string][] = [
   ["overview", "Overview"],
   ["two-ways", "Two ways in"],
-  ["direct", "Launching on FeeFlow"],
+  ["direct", "Launching on Feeward"],
   ["relayed", "A coin you already launched"],
   ["naming", "Tagging the chooser"],
   ["roles", "Chooser, recipient, payout destination"],
@@ -16,7 +16,7 @@ const toc: [string, string][] = [
   ["fallback", "Fallback"],
   ["split", "The 90/5/5 split"],
   ["receipts", "Statuses, receipts and posts"],
-  ["buyback", "The FeeFlow coin buyback"],
+  ["buyback", "The Feeward coin buyback"],
   ["not-registering", "If a coin isn't registering"],
   ["glossary", "Glossary"],
 ];
@@ -39,23 +39,23 @@ export default function Docs() {
         ))}
       </nav>
       <article className="prose">
-        <h1>How FeeFlow works</h1>
+        <h1>How Feeward works</h1>
         <p>
-          FeeFlow is transparent funding through coin creator fees. A coin tags an X account; that account chooses who receives 90% of its creator fees: themselves, a
+          Feeward is transparent funding through coin creator fees. A coin tags an X account; that account chooses who receives 90% of its creator fees: themselves, a
           creator, a project, a cause, a foundation, a community or a nonprofit. The recipient chooses where the money goes, their own wallet or a nonprofit on donate.gg, and
           every payout is a public transaction.
         </p>
         <p>
-          FeeFlow's code is public: <a href="https://github.com/Jrfishcool12/feeflow" target="_blank" rel="noopener">github.com/Jrfishcool12/feeflow</a>. The fee split, payouts, wallet checks and X-reply handling
+          Feeward's code is public: <a href="https://github.com/Jrfishcool12/feeflow" target="_blank" rel="noopener">github.com/Jrfishcool12/feeflow</a>. The fee split, payouts, wallet checks and X-reply handling
           described below are all in it, so you can check that the code does what these docs say.
         </p>
 
         <H id="overview" n={1}>Overview</H>
-        <p>A coin on Pump.fun earns creator fees on every trade. On a FeeFlow coin those fees are split three ways, every time:</p>
+        <p>A coin on Pump.fun earns creator fees on every trade. On a Feeward coin those fees are split three ways, every time:</p>
         <dl className="facts">
           <dt>To the recipient's wallet or nonprofit</dt><dd>90%</dd>
-          <dt>To FeeFlow</dt><dd>5%</dd>
-          <dt>Buys and burns the FeeFlow coin</dt><dd>5%</dd>
+          <dt>To Feeward</dt><dd>5%</dd>
+          <dt>Buys and burns the Feeward coin</dt><dd>5%</dd>
         </dl>
         <p>
           These are shares of the creator fees, the small fee Pump.fun pays a coin's creator on each trade. They aren't shares of trading volume or of what anyone spends buying
@@ -64,23 +64,23 @@ export default function Docs() {
 
         <H id="two-ways" n={2}>Two ways in</H>
         <dl className="facts">
-          <dt>Direct</dt><dd>Launched on FeeFlow. The split is set at launch and locked by Pump.fun; the recipient share goes through the FeeFlow treasury.</dd>
-          <dt>Relayed</dt><dd>Launched anywhere on Pump.fun. Fees go to the FeeFlow treasury first and are forwarded in public.</dd>
+          <dt>Direct</dt><dd>Launched on Feeward. The split is set at launch and locked by Pump.fun; the recipient share goes through the Feeward treasury.</dd>
+          <dt>Relayed</dt><dd>Launched anywhere on Pump.fun. Fees go to the Feeward treasury first and are forwarded in public.</dd>
         </dl>
         <p>The split, the receipts and the roles are the same either way. Every coin is labeled Direct or Relayed.</p>
 
-        <H id="direct" n={3}>Launching on FeeFlow</H>
+        <H id="direct" n={3}>Launching on Feeward</H>
         <ol className="steps-num">
           <li><span><b>Fill in the coin</b>Name, ticker, image and the X account to tag, on the <Link href="/launch">launch page</Link>.</span></li>
-          <li><span><b>Sign the launch</b>Log in with X and your FeeFlow wallet signs it, or use Phantom or another Solana wallet. Either way, only your wallet signs the Pump.fun launch.</span></li>
-          <li><span><b>Routing switches on</b>Seconds later, fee sharing is set: the recipient share is held in the FeeFlow treasury, and the FeeFlow and buyback shares go out as usual. The coin page shows the split checked on-chain, and @FeeFlowApp tags that account on X.</span></li>
+          <li><span><b>Sign the launch</b>Log in with X and your Feeward wallet signs it, or use Phantom or another Solana wallet. Either way, only your wallet signs the Pump.fun launch.</span></li>
+          <li><span><b>Routing switches on</b>Seconds later, fee sharing is set: the recipient share is held in the Feeward treasury, and the Feeward and buyback shares go out as usual. The coin page shows the split checked on-chain, and @feewardx tags that account on X.</span></li>
         </ol>
-        <p>You don't earn creator fees from a FeeFlow coin. A dev buy is optional.</p>
+        <p>You don't earn creator fees from a Feeward coin. A dev buy is optional.</p>
 
         <H id="relayed" n={4}>A coin you already launched</H>
         <p>No sign-up and no approval. A coin that meets these three conditions registers on its own:</p>
         <ol className="steps-num">
-          <li><span><b>Send 100% of fees to the FeeFlow treasury</b>On the coin's Pump.fun page, open fee sharing and add this address at 100%, with no other recipients:</span></li>
+          <li><span><b>Send 100% of fees to the Feeward treasury</b>On the coin's Pump.fun page, open fee sharing and add this address at 100%, with no other recipients:</span></li>
         </ol>
         <p><TreasuryAddress /></p>
         <ol className="steps-num" start={2} style={{ counterReset: "s 1" }}>
@@ -94,10 +94,10 @@ export default function Docs() {
 
         <H id="naming" n={5}>Tagging the chooser</H>
         <p>For relayed coins, the X account is read from the coin's description. Put this line in it:</p>
-        <code className="line">Fees to @handle via FeeFlow</code>
+        <code className="line">Fees to @handle via Feeward</code>
         <p>Write anything else you like around the line. For direct coins you name the account on the launch page instead.</p>
         <p>
-          The account doesn't need to agree, know in advance, hold a wallet or have an account here. Being tagged doesn't mean they endorsed the coin, and FeeFlow says so on the coin's
+          The account doesn't need to agree, know in advance, hold a wallet or have an account here. Being tagged doesn't mean they endorsed the coin, and Feeward says so on the coin's
           page and in its posts.
         </p>
 
@@ -108,7 +108,7 @@ export default function Docs() {
           <dt>Payout destination</dt><dd>The recipient's own wallet (support) or a nonprofit on donate.gg (a donation). Chosen once.</dd>
         </dl>
         <p>
-          A cause, foundation, community or project is represented by whatever X account the chooser picks. Those labels don't mean the account is a registered nonprofit: FeeFlow
+          A cause, foundation, community or project is represented by whatever X account the chooser picks. Those labels don't mean the account is a registered nonprofit: Feeward
           confirms who controls an X account by X login and doesn't verify nonprofit status. Accounts are recorded by their permanent X id, so a renamed account or a handle that
           changes hands can't redirect funds to someone else.
         </p>
@@ -116,7 +116,7 @@ export default function Docs() {
         <H id="choosing" n={7}>Choosing the recipient</H>
         <p>The chooser picks one of two ways:</p>
         <ol className="steps-num">
-          <li><span><b>Reply on X</b>Reply to @FeeFlowApp's post about the coin with the recipient's @handle, or "me". FeeFlow checks the reply came from the chooser's account, matches it to the coin, looks the handle up, and replies naming the exact account it selected. A reply with several handles, a handle that doesn't exist or unclear wording gets a request to try again instead.</span></li>
+          <li><span><b>Reply on X</b>Reply to @feewardx's post about the coin with the recipient's @handle, or "me". Feeward checks the reply came from the chooser's account, matches it to the coin, looks the handle up, and replies naming the exact account it selected. A reply with several handles, a handle that doesn't exist or unclear wording gets a request to try again instead.</span></li>
           <li><span><b>On the website</b>Log in with X on the coin's page, type the handle, check the account it resolves to, and confirm. Useful for protected accounts, or if you'd rather not reply publicly.</span></li>
         </ol>
         <p>
@@ -128,8 +128,8 @@ export default function Docs() {
         <p>The recipient logs in with X on the coin's page and chooses one destination:</p>
         <dl className="facts">
           <dt>Their wallet</dt><dd>They connect it and sign a message proving they own it (no transaction, no fee). Payments are support, not donations.</dd>
-          <dt>A nonprofit</dt><dd>Any nonprofit on donate.gg's onboarded list. donate.gg delivers it; the nonprofit doesn't need a FeeFlow account.</dd>
-          <dt>Pass it on</dt><dd>Reply to @FeeFlowApp with another account's @handle, or choose "Someone else" on the coin's page. That account becomes the recipient and can do the same. Each pass is in the coin's public record.</dd>
+          <dt>A nonprofit</dt><dd>Any nonprofit on donate.gg's onboarded list. donate.gg delivers it; the nonprofit doesn't need a Feeward account.</dd>
+          <dt>Pass it on</dt><dd>Reply to @feewardx with another account's @handle, or choose "Someone else" on the coin's page. That account becomes the recipient and can do the same. Each pass is in the coin's public record.</dd>
           <dt>Decline</dt><dd>Funds go to the fallback nonprofit instead.</dd>
         </dl>
         <p>
@@ -146,12 +146,12 @@ export default function Docs() {
         <H id="split" n={10}>The 90/5/5 split</H>
         <dl className="facts">
           <dt>Applied</dt><dd>To every creator fee, on every coin, whatever the destination</dd>
-          <dt>Direct coins</dt><dd>Pump.fun's fee sharing pays all three at once; the recipient share goes through the FeeFlow treasury</dd>
+          <dt>Direct coins</dt><dd>Pump.fun's fee sharing pays all three at once; the recipient share goes through the Feeward treasury</dd>
           <dt>Relayed coins</dt><dd>Each payout pays all three in one transaction</dd>
           <dt>Changed by</dt><dd>Nobody. Pump.fun locks a coin's split after it's set</dd>
         </dl>
         <p>
-          Before a destination is set, the recipient share is held in the FeeFlow treasury and recorded against the coin it came from, read from each payout transaction. Failed
+          Before a destination is set, the recipient share is held in the Feeward treasury and recorded against the coin it came from, read from each payout transaction. Failed
           transactions create no payout and are retried; funds stay where they are in the meantime.
         </p>
 
@@ -166,12 +166,12 @@ export default function Docs() {
         </dl>
         <p>
           Every payout appears in the public <Link href="/donations">payout feed</Link> and on its coin's page with its transaction, along with a record of who chose what and when.
-          @FeeFlowApp posts milestones with a receipt card. Wallet payouts are called support; donate.gg payouts are called donations.
+          @feewardx posts milestones with a receipt card. Wallet payouts are called support; donate.gg payouts are called donations.
         </p>
 
-        <H id="buyback" n={12}>The FeeFlow coin buyback</H>
+        <H id="buyback" n={12}>The Feeward coin buyback</H>
         <p>
-          5% of fees goes to the buyback wallet. At a random moment between 5 minutes and an hour after the last attempt, it buys the FeeFlow coin on the open market and burns everything it
+          5% of fees goes to the buyback wallet. At a random moment between 5 minutes and an hour after the last attempt, it buys the Feeward coin on the open market and burns everything it
           bought. Random timing means nobody can trade around it. The coin gates nothing. See <Link href="/buyback">Buyback</Link> and <Link href="/legal/disclosures">Disclosures</Link>.
         </p>
 
@@ -179,8 +179,8 @@ export default function Docs() {
         <dl className="facts">
           <dt>Not the whole fee</dt><dd>The treasury gets a partial share. It has to be 100%.</dd>
           <dt>Not locked</dt><dd>Fee sharing can still be edited. Revoke its authority on Pump.fun.</dd>
-          <dt>Wrong address</dt><dd>Fees go to an address that isn't the FeeFlow treasury.</dd>
-          <dt>No handle line</dt><dd>The description doesn't contain "Fees to @handle via FeeFlow".</dd>
+          <dt>Wrong address</dt><dd>Fees go to an address that isn't the Feeward treasury.</dd>
+          <dt>No handle line</dt><dd>The description doesn't contain "Fees to @handle via Feeward".</dd>
           <dt>Handle not found</dt><dd>The tagged account doesn't exist on X.</dd>
           <dt>Wrong coin type</dt><dd>Holder-rewards and cashback coins don't pay creator fees.</dd>
           <dt>Too recent</dt><dd>The indexer runs every few minutes. Check the coin to register it right away.</dd>
@@ -195,7 +195,7 @@ export default function Docs() {
           <dt>Support</dt><dd>A payout to a recipient's wallet.</dd>
           <dt>Donation</dt><dd>A payout to a nonprofit through donate.gg.</dd>
           <dt>Treasury</dt><dd>Where the recipient share is held until a destination is set, and where relayed coins send fees.</dd>
-          <dt>FeeFlow wallet</dt><dd>A Solana wallet created when you log in with X, provided by Privy. Use it to launch and receive payouts; only you can use it, and you can export its key.</dd>
+          <dt>Feeward wallet</dt><dd>A Solana wallet created when you log in with X, provided by Privy. Use it to launch and receive payouts; only you can use it, and you can export its key.</dd>
           <dt>Fallback nonprofit</dt><dd>Where funds go if the recipient declines or no destination is set within 90 days.</dd>
           <dt>Fee sharing</dt><dd>Pump.fun's setting that splits creator fees across up to ten addresses.</dd>
         </dl>

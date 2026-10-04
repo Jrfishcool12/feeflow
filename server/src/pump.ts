@@ -30,7 +30,7 @@ export type Share = { address: PublicKey; shareBps: number };
 
 /**
  * The split a coin should have. `configId` null means the honoree hasn't chosen yet: the
- * nonprofit share is held in the FeeFlow treasury until they do.
+ * nonprofit share is held in the Feeward treasury until they do.
  */
 export function expectedShares(mint: PublicKey, configId: PublicKey | null): Share[] {
   return [
@@ -115,7 +115,7 @@ export async function setupRouting(mintStr: string, configIdStr: string, honoree
 
   let sharing = await readSharing(mint);
   if (!sharing) {
-    if (!curve.creator.equals(admin)) throw new Error("This coin wasn't launched on FeeFlow, so its fees can't be routed here.");
+    if (!curve.creator.equals(admin)) throw new Error("This coin wasn't launched on Feeward, so its fees can't be routed here.");
     const pool = curve.complete ? canonicalPumpPoolPda(mint) : null;
     const create = await PUMP_SDK.createFeeSharingConfig({ creator: admin, mint, pool });
     await send([routerOn() ? enableSharingIx(mint, create) : create]);
@@ -236,7 +236,7 @@ export async function donatedTotal(mintStr: string, configIds: string[]): Promis
 /** Checks the live on-chain split is exactly what we promise: our escrow for this charity + fixed platform cut. */
 export function audit(mint: PublicKey, configId: PublicKey | null, sharing: { admin: PublicKey; shareholders: Share[] }) {
   const problems: string[] = [];
-  if (!sharing.admin.equals(feeAdmin())) problems.push(`admin is ${sharing.admin.toBase58()}, not ${routerOn() ? "the FeeFlow router" : "our authority"}`);
+  if (!sharing.admin.equals(feeAdmin())) problems.push(`admin is ${sharing.admin.toBase58()}, not ${routerOn() ? "the Feeward router" : "our authority"}`);
   const want = expectedShares(mint, configId);
   const have = sharing.shareholders;
   const same = want.length === have.length && want.every((w) => have.some((h) => h.address.equals(w.address) && h.shareBps === w.shareBps));

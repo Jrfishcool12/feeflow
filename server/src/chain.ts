@@ -3,7 +3,40 @@ import { createHmac } from "node:crypto";
 import bs58 from "bs58";
 import { cfg } from "./config.js";
 
-export const conn = new Connection(cfg.RPC_URL, "confirmed");
+/**
+ * RPC usage, logged every 3 minutes: calls per method, and which methods the provider refused (HTTP 429)
+ * with its reason, so rate limits can be traced to the calls that cause them.
+ */
+const rpcCalls = new Map<string, number>();
+const rpcLimited = new Map<string, number>();
+let rpcReason = "";
+const rpcFetch = async (input: any, init?: any) => {
+  let methods: string[] = [];
+  try {
+    const body = JSON.parse(String(init?.body ?? ""));
+    methods = (Array.isArray(body) ? body : [body]).map((x: any) => String(x.method));
+  } catch {
+    /* not a JSON-RPC body */
+  }
+  for (const m of methods) rpcCalls.set(m, (rpcCalls.get(m) ?? 0) + 1);
+  const res = await fetch(input, init);
+  if (res.status === 429) {
+    for (const m of methods) rpcLimited.set(m, (rpcLimited.get(m) ?? 0) + 1);
+    if (!rpcReason) rpcReason = (await res.clone().text().catch(() => "")).slice(0, 200);
+  }
+  return res;
+};
+const top = (m: Map<string, number>) => [...m].sort((a, b) => b[1] - a[1]).slice(0, 8).map(([k, v]) => `${k} ${v}`).join(", ");
+setInterval(() => {
+  const total = [...rpcCalls.values()].reduce((a, b) => a + b, 0);
+  if (total) console.log(`rpc: ${total} calls in 3 min (${(total / 180).toFixed(1)}/s avg): ${top(rpcCalls)}`);
+  if (rpcLimited.size) console.log(`rpc 429s: ${top(rpcLimited)}${rpcReason ? ` | provider said: ${rpcReason}` : ""}`);
+  rpcCalls.clear();
+  rpcLimited.clear();
+  rpcReason = "";
+}, 180_000).unref();
+
+export const conn = new Connection(cfg.RPC_URL, { commitment: "confirmed", fetch: rpcFetch as any });
 
 function parseKeypair(secret: string): Keypair {
   const s = secret.trim();
@@ -19,7 +52,7 @@ export const platformWallet = new PublicKey(cfg.PLATFORM_WALLET);
  * the platform coin, then burns what it bought. Derived from the authority key, so there's
  * no extra secret to manage. It only ever holds SOL waiting to be spent.
  */
-// The "iyn-" salts below predate the FeeFlow name. Never change them: they derive live keys.
+// The "iyn-" salts below predate the Feeward name. Never change them: they derive live keys.
 export const buybackWallet = Keypair.fromSeed(createHmac("sha256", Buffer.from(authority.secretKey)).update("iyn-buyback").digest());
 if (buybackWallet.publicKey.equals(platformWallet)) throw new Error("PLATFORM_WALLET can't be the buyback wallet.");
 
@@ -60,7 +93,7 @@ export async function submit(tx: VersionedTransaction, _blockhash?: string, last
   }
 }
 
-/** The FeeFlow treasury: holds donations until honorees choose, and receives relayed coins' fees. */
+/** The Feeward treasury: holds donations until honorees choose, and receives relayed coins' fees. */
 export function treasury(): Keypair {
   return Keypair.fromSeed(createHmac("sha256", cfg.MASTER_SEED!).update("goodcall-treasury").digest());
 }

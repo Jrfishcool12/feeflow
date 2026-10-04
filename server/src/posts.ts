@@ -2,7 +2,7 @@ import { db, now } from "./db.js";
 import { botPost } from "./x.js";
 
 /**
- * Posts from @FeeFlowApp about a coin and remembers the post, so a reply to any of the coin's
+ * Posts from @feewardx about a coin and remembers the post, so a reply to any of the coin's
  * posts can be matched back to the coin. Returns the post id (null when posting is off or failed).
  */
 export async function coinPost(mint: string, kind: string, text: string, replyTo?: string | null, image?: Buffer | null): Promise<string | null> {

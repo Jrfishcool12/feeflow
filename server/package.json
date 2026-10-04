@@ -20,6 +20,7 @@
     "@fastify/cookie": "^11.1.2",
     "@fastify/static": "^10.1.5",
     "@fontsource/inter": "^5.3.0",
+    "@fontsource/manrope": "^5.3.0",
     "@pump-fun/pump-sdk": "^2.0.0",
     "@pump-fun/pump-swap-sdk": "^1.20.0",
     "@resvg/resvg-js": "^2.6.2",

@@ -5,9 +5,9 @@ import { SplitBar } from "./SplitBar";
 
 const ROLE: Record<string, string> = {
   charity: "Nonprofit donation escrow",
-  held: "Recipient share, through the FeeFlow treasury",
-  platform: "FeeFlow",
-  buyback: "FeeFlow coin buyback",
+  held: "Recipient share, through the Feeward treasury",
+  platform: "Feeward",
+  buyback: "Feeward coin buyback",
   unknown: "Unknown address",
 };
 
@@ -29,7 +29,7 @@ export function WhereFeesGo({ d, cfg }: { d: CoinDetail; cfg: Config | null }) {
     <p className="muted small">Couldn't reach the chain to check just now. Reload in a minute.</p>
   ) : a.ok ? (
     <p className="ok">
-      {c.mode === "relay" ? "Checked on-chain: 100% of this coin's creator fees go to the FeeFlow treasury, locked." : "Checked on-chain: the split matches."}
+      {c.mode === "relay" ? "Checked on-chain: 100% of this coin's creator fees go to the Feeward treasury, locked." : "Checked on-chain: the split matches."}
     </p>
   ) : (
     <p className="err">Doesn't match: {a.problems.join("; ")}</p>
@@ -49,8 +49,8 @@ export function WhereFeesGo({ d, cfg }: { d: CoinDetail; cfg: Config | null }) {
         <p className="muted small">
           Earned on Pump.fun, not yet collected: <b>{money(c.accrued_lamports, usd)}</b>.
           {c.accrue_min_lamports && c.accrued_lamports < c.accrue_min_lamports
-            ? ` Pump.fun releases a coin's creator fees once they reach ${money(c.accrue_min_lamports, usd)}; FeeFlow collects them automatically after that.`
-            : " FeeFlow collects these automatically within a few minutes."}
+            ? ` Pump.fun releases a coin's creator fees once they reach ${money(c.accrue_min_lamports, usd)}; Feeward collects them automatically after that.`
+            : " Feeward collects these automatically within a few minutes."}
         </p>
       ) : null}
       {c.pending_lamports ? (
@@ -72,15 +72,15 @@ export function WhereFeesGo({ d, cfg }: { d: CoinDetail; cfg: Config | null }) {
         </ul>
       ) : (
         <p className="muted small">
-          This coin was launched elsewhere, so its fees are relayed: Pump.fun sends them to the FeeFlow treasury{" "}
+          This coin was launched elsewhere, so its fees are relayed: Pump.fun sends them to the Feeward treasury{" "}
           <a href={solscanAccount(c.vault!)} target="_blank" rel="noopener">
             {short(c.vault)}
           </a>
-          , and FeeFlow attributes each payout to this coin from the transaction itself.
+          , and Feeward attributes each payout to this coin from the transaction itself.
         </p>
       )}
       <p className="muted small">
-        The recipient share waits in the FeeFlow treasury, recorded against this coin, until the recipient sets a payout destination. Then it's sent there in public
+        The recipient share waits in the Feeward treasury, recorded against this coin, until the recipient sets a payout destination. Then it's sent there in public
         transactions: to their verified wallet (support), or to a nonprofit's donate.gg escrow (a donation).{" "}
         {c.mode === "launch" ? "Pump.fun locked this split when the coin launched, so nobody can change it." : ""}
       </p>
@@ -105,7 +105,7 @@ export function WhereFeesGo({ d, cfg }: { d: CoinDetail; cfg: Config | null }) {
                     )}
                     <span className="muted">
                       {" "}
-                      + {money(f.platform_lamports, usd)} FeeFlow, {money(f.buyback_lamports, usd)} buyback
+                      + {money(f.platform_lamports, usd)} Feeward, {money(f.buyback_lamports, usd)} buyback
                     </span>
                   </td>
                   <td>

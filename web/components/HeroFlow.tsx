@@ -114,7 +114,7 @@ export function HeroFlow({ coin, donation, solUsd }: Props) {
           <dt>from</dt>
           <dd>${symbol} creator fees</dd>
           <dt>split</dt>
-          <dd>90% recipient · 5% FeeFlow · 5% buyback</dd>
+          <dd>90% recipient · 5% Feeward · 5% buyback</dd>
           <dt>tx</dt>
           <dd>{donation?.signature ? short(donation.signature) : paid ? (ex ? "public on Solscan" : "on Solscan") : "pending"}</dd>
         </dl>

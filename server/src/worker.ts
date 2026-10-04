@@ -192,7 +192,7 @@ async function buyback() {
   const hit = LADDER.filter((m) => dollars >= m).at(-1) ?? 0;
   if (hit > Number(kvGet("buyback_milestone") ?? 0)) {
     kvSet("buyback_milestone", String(hit));
-    await botPost(`FeeFlow coins have now bought back and burned ${fmtUsd(dollars)} of the platform coin. 5% of every coin's fees buys it back. ${cfg.PUBLIC_URL}`);
+    await botPost(`Feeward coins have now bought back and burned ${fmtUsd(dollars)} of the platform coin. 5% of every coin's fees buys it back. ${cfg.PUBLIC_URL}`);
   }
 }
 

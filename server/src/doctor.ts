@@ -14,7 +14,7 @@ const line = (ok: boolean | "warn", label: string, detail = "") => {
   console.log(`${ok === true ? "  ok  " : ok === "warn" ? " warn " : " FIX  "} ${label}${detail ? `: ${detail}` : ""}`);
 };
 
-console.log("FeeFlow server check\n");
+console.log("Feeward server check\n");
 
 try {
   const genesis = await conn.getGenesisHash();
@@ -49,7 +49,7 @@ const dummy = (v?: string) => !v || v === "dummy";
 line(dummy(cfg.X_BEARER_TOKEN) ? false : true, "X bearer token", dummy(cfg.X_BEARER_TOKEN) ? "needed to look up honorees at launch" : "set");
 line(dummy(cfg.X_CLIENT_ID) ? false : true, "X OAuth client", dummy(cfg.X_CLIENT_ID) ? "needed for honoree login" : "set");
 line(cfg.X_BOT_ACCESS_TOKEN ? true : "warn", "X bot", cfg.X_BOT_ACCESS_TOKEN ? "set" : "not set: posts are only logged");
-line(RELAY_ON ? true : "warn", "Relayed coins and buyback", RELAY_ON ? `on (house coin ${cfg.HOUSE_MINT})` : "off until HOUSE_MINT is set (after you launch the FeeFlow coin)");
+line(RELAY_ON ? true : "warn", "Relayed coins and buyback", RELAY_ON ? `on (house coin ${cfg.HOUSE_MINT})` : "off until HOUSE_MINT is set (after you launch the Feeward coin)");
 line(cfg.PUBLIC_URL.startsWith("https") ? true : "warn", "PUBLIC_URL", cfg.PUBLIC_URL);
 
 console.log(failures ? `\n${failures} thing(s) to fix.` : "\nReady.");

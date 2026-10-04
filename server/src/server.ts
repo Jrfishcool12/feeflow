@@ -49,7 +49,7 @@ function publicCoin(c: Coin) {
     recipient_selected_at: c.recipient_selected_at,
     recipient_selected_via: c.recipient_selected_via,
     selection_tweet: c.selection_tweet_id,
-    // @FeeFlowApp's post about this coin: the chooser can reply to it with the recipient's @handle.
+    // @feewardx's post about this coin: the chooser can reply to it with the recipient's @handle.
     announce_tweet: c.announce_tweet,
     recipient_declined_at: c.recipient_declined_at,
     state,
@@ -455,7 +455,7 @@ export async function buildServer() {
 
   // ----- launch -----
 
-  // ---------- FeeFlow wallets (Privy embedded wallets): balance, withdrawals ----------
+  // ---------- Feeward wallets (Privy embedded wallets): balance, withdrawals ----------
   // Keys never touch this server: it reads balances, builds unsigned transfers, and relays transactions
   // the user's own wallet has already signed.
   const toKey = (s: string) => {
@@ -493,7 +493,7 @@ export async function buildServer() {
     return { tx: Buffer.from(new VersionedTransaction(msg).serialize()).toString("base64"), lamports };
   });
 
-  /** Sends a transaction the user's wallet has already fully signed. FeeFlow adds nothing to it. */
+  /** Sends a transaction the user's wallet has already fully signed. Feeward adds nothing to it. */
   app.post("/api/wallet/send", async (req) => {
     if (!allow(`wallet:${req.ip}`, 60)) throw httpError(429, "Too many requests. Try again in a few minutes.");
     const { tx } = z.object({ tx: z.string() }).parse(req.body);
@@ -513,7 +513,7 @@ export async function buildServer() {
     }
   });
 
-  /** @FeeFlowApp's post about a coin, for the coin's X link. */
+  /** @feewardx's post about a coin, for the coin's X link. */
   app.get("/api/coins/:mint/post", async (req) => {
     const c = getCoin((req.params as { mint: string }).mint);
     return { tweet: c?.announce_tweet ?? null };
@@ -544,7 +544,7 @@ export async function buildServer() {
         symbol: b.symbol,
         description,
         imageDataUrl: b.image,
-        // No X page given: link to @FeeFlowApp's post about this coin (via a redirect, since the post comes after launch).
+        // No X page given: link to @feewardx's post about this coin (via a redirect, since the post comes after launch).
         twitter: socialLink(b.twitter, "https://x.com/", "X") ?? `${cfg.PUBLIC_URL}/x/${mintKp.publicKey.toBase58()}`,
         website: socialLink(b.website, "https://", "website"),
         telegram: socialLink(b.telegram, "https://t.me/", "Telegram"),
@@ -603,7 +603,7 @@ export async function buildServer() {
 
   /** Checks a coin against every relay condition and registers it right away if it passes. */
   app.post("/api/check", async (req) => {
-    if (!RELAY_ON) throw httpError(404, "This server only supports coins launched on FeeFlow.");
+    if (!RELAY_ON) throw httpError(404, "This server only supports coins launched on Feeward.");
     if (!allow(`check:${req.ip}`, 30)) throw httpError(429, "Too many checks. Try again in a few minutes.");
     const { mint } = z.object({ mint: z.string().trim().min(32).max(44) }).parse(req.body);
     return checkCoin(mint, "site");

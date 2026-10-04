@@ -33,7 +33,7 @@ const Env = z.object({
   HOLD_DAYS: z.coerce.number().int().min(0).default(90),
   // Where unclaimed or declined funds go (a donate.gg config id). Defaults to DEFAULT_CONFIG_ID.
   FALLBACK_CONFIG_ID: opt,
-  // How often to read replies to @FeeFlowApp for recipient selections. 0 turns it off.
+  // How often to read replies to @feewardx for recipient selections. 0 turns it off.
   REPLY_POLL_SECONDS: z.coerce.number().int().min(0).default(120),
   HOUSE_MINT: opt,
 
@@ -44,7 +44,7 @@ const Env = z.object({
   X_BOT_APP_SECRET: opt,
   X_BOT_ACCESS_TOKEN: opt,
   X_BOT_ACCESS_SECRET: opt,
-  BRAND_HANDLE: z.string().default("FeeFlowApp"),
+  BRAND_HANDLE: z.string().default("feewardx"),
 
   PUBLIC_URL: z.string().url(),
   PORT: z.coerce.number().int().default(8787),
@@ -61,7 +61,7 @@ if (!cfg.MASTER_SEED || cfg.MASTER_SEED.length < 32) throw new Error("MASTER_SEE
 // The platform coin is its own setting: HOUSE_MINT is the escrow host coin, which nobody should buy.
 export const PLATFORM_COIN = cfg.PLATFORM_COIN_MINT;
 if (cfg.BUYBACK_MIN_SECONDS >= cfg.BUYBACK_MAX_SECONDS) throw new Error("BUYBACK_MIN_SECONDS must be less than BUYBACK_MAX_SECONDS.");
-if (cfg.BUYBACK_BPS > 0 && !PLATFORM_COIN) console.warn("Buybacks wait until PLATFORM_COIN_MINT is set to the FeeFlow coin.");
+if (cfg.BUYBACK_BPS > 0 && !PLATFORM_COIN) console.warn("Buybacks wait until PLATFORM_COIN_MINT is set to the Feeward coin.");
 /** Unclaimed or declined funds go here. */
 export const FALLBACK_CONFIG = () => cfg.FALLBACK_CONFIG_ID ?? cfg.DEFAULT_CONFIG_ID ?? null;
 /** Recipient's share of every coin's creator fees, in basis points. */

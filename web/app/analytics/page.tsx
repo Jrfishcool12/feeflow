@@ -15,7 +15,7 @@ export default function Analytics() {
     <div className="wrap" style={{ paddingBottom: 96 }}>
       <div className="page-head">
         <h1>Analytics</h1>
-        <p className="sub">What FeeFlow coins have sent to nonprofits, from the same ledger that powers every receipt.</p>
+        <p className="sub">What Feeward coins have sent to nonprofits, from the same ledger that powers every receipt.</p>
       </div>
       <div className="toolbar">
         <div className="seg" role="group" aria-label="Period">
@@ -31,7 +31,7 @@ export default function Analytics() {
         <div className="stat-tile dark"><small>Paid out</small><b>{money(s?.donated_lamports ?? 0, usd)}</b></div>
         <div className="stat-tile mint"><small>Payouts</small><b>{(s?.donations ?? 0).toLocaleString("en-US")}</b></div>
         <div className="stat-tile"><small>New coins</small><b>{(s?.coins_new ?? 0).toLocaleString("en-US")}</b></div>
-        <div className="stat-tile"><small>FeeFlow coin bought back</small><b>{money(s?.buyback_lamports ?? 0, usd)}</b></div>
+        <div className="stat-tile"><small>Feeward coin bought back</small><b>{money(s?.buyback_lamports ?? 0, usd)}</b></div>
       </div>
       <section style={{ marginTop: 16 }}>
         {s ? <BarChart series={s.series} solUsd={usd} bucket={range === "1d" ? "hour" : "day"} /> : <div className="chart-empty">Loading…</div>}
@@ -51,7 +51,7 @@ export default function Analytics() {
           </ol>
         </section>
         <section className="panel">
-          <h2>Across FeeFlow</h2>
+          <h2>Across Feeward</h2>
           <dl className="facts" style={{ background: "transparent", padding: 0 }}>
             <dt>Coins giving</dt><dd>{s?.coins ?? 0}</dd>
             <dt>People named</dt><dd>{s?.honorees ?? 0}</dd>

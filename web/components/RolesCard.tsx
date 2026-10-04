@@ -9,7 +9,7 @@ export function RolesCard({ d }: { d: CoinDetail }) {
   const c = d.coin;
   const action = actionNeeded(c);
   const fallbackName = c.fallback?.name ?? "the fallback nonprofit";
-  const via = c.recipient_selected_via === "x_reply" ? "by replying on X" : c.recipient_selected_via === "migrated" ? "before roles were split" : "on FeeFlow";
+  const via = c.recipient_selected_via === "x_reply" ? "by replying on X" : c.recipient_selected_via === "migrated" ? "before roles were split" : "on Feeward";
   return (
     <section className="panel roles">
       <h2>Who's who</h2>
@@ -76,7 +76,7 @@ export function RolesCard({ d }: { d: CoinDetail }) {
         <dt>Status</dt>
         <dd>
           <span className={`badge${c.state === "active" ? " green" : ""}`}>{STATE_LABEL[c.state]}</span>
-          {c.holding && c.waiting_lamports > 0 ? <small>{money(c.waiting_lamports, d.sol_usd)} held in the FeeFlow treasury for this coin.</small> : null}
+          {c.holding && c.waiting_lamports > 0 ? <small>{money(c.waiting_lamports, d.sol_usd)} held in the Feeward treasury for this coin.</small> : null}
           {action ? <small>Waiting on: {action}.</small> : null}
         </dd>
 
@@ -95,7 +95,7 @@ export function RolesCard({ d }: { d: CoinDetail }) {
         </dd>
       </dl>
       <p className="muted small" style={{ marginTop: 14 }}>
-        Being tagged on a coin or chosen as its recipient doesn't mean an account endorsed the coin. FeeFlow confirms who controls each X account by X login; it doesn't
+        Being tagged on a coin or chosen as its recipient doesn't mean an account endorsed the coin. Feeward confirms who controls each X account by X login; it doesn't
         verify nonprofit status. Labels like "cause" or "foundation" don't mean a registered nonprofit.
       </p>
     </section>

@@ -7,10 +7,10 @@ import { api } from "./api";
 import type { Provider } from "./wallet";
 
 /**
- * The user's FeeFlow wallet: a Privy embedded Solana wallet created when they log in with X.
+ * The user's Feeward wallet: a Privy embedded Solana wallet created when they log in with X.
  * `provider` has the same shape as Phantom's, so launch and payout code can use either.
  */
-export function useFeeFlowWallet() {
+export function useFeewardWallet() {
   const { ready, authenticated, login, logout, user } = usePrivy();
   const { ready: walletsReady, wallets } = useWallets();
   const { signTransaction } = useSignTransaction();

@@ -12,9 +12,9 @@ export default function Buyback() {
   return (
     <div className="wrap" style={{ paddingBottom: 96 }}>
       <div className="page-head">
-        <h1>The FeeFlow coin buyback</h1>
+        <h1>The Feeward coin buyback</h1>
         <p className="sub">
-          {cfg ? pct(cfg.buyback_bps) : "5%"} of every FeeFlow coin's creator fees buys the FeeFlow coin on the open market and burns it. The buys happen at random times, so they can't be traded around.
+          {cfg ? pct(cfg.buyback_bps) : "5%"} of every Feeward coin's creator fees buys the Feeward coin on the open market and burns it. The buys happen at random times, so they can't be traded around.
         </p>
       </div>
       <div className="stats" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
@@ -28,7 +28,7 @@ export default function Buyback() {
           <ol className="steps-num">
             <li><span><b>A share of every coin's fees</b>{cfg ? pct(cfg.buyback_bps) : "5%"} of creator fees, direct or relayed, goes to the buyback wallet.</span></li>
             <li><span><b>A random moment</b>Between 5 minutes and an hour after the last attempt, drawn fresh each time with cryptographic randomness.</span></li>
-            <li><span><b>Buy and burn</b>Once the wallet can spend at least 0.05 SOL (it holds about 0.058 SOL, leaving room for slippage and fees), it buys the FeeFlow coin and burns every token it bought.</span></li>
+            <li><span><b>Buy and burn</b>Once the wallet can spend at least 0.05 SOL (it holds about 0.058 SOL, leaving room for slippage and fees), it buys the Feeward coin and burns every token it bought.</span></li>
           </ol>
           <p className="muted small">
             The coin gates nothing: holding it doesn't change any split or give any rights. {data?.platform_coin ? <a href={pumpCoin(data.platform_coin)} target="_blank" rel="noopener">See it on Pump.fun</a> : null}
@@ -53,7 +53,7 @@ export default function Buyback() {
           </table>
         </section>
       </div>
-      <p className="muted small" style={{ marginTop: 18 }}>See <Link href="/legal/disclosures">disclosures</Link> for what the FeeFlow coin is not.</p>
+      <p className="muted small" style={{ marginTop: 18 }}>See <Link href="/legal/disclosures">disclosures</Link> for what the Feeward coin is not.</p>
     </div>
   );
 }

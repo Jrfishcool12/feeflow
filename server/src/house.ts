@@ -21,17 +21,17 @@ if (cfg.HOUSE_MINT) {
   process.exit(0);
 }
 
-const imagePath = "../web/public/feeflow-og.png";
+const imagePath = "../web/public/feeward-og.png";
 const image = existsSync(imagePath) ? `data:image/png;base64,${readFileSync(imagePath).toString("base64")}` : null;
 if (!image) throw new Error(`Couldn't find ${imagePath} for the coin image.`);
 
-const name = "FeeFlow Escrows";
+const name = "Feeward Escrows";
 const symbol = "GCESCROW";
 console.log("Uploading metadata...");
 const uri = await pinMetadata({
   name,
   symbol,
-  description: "Holds FeeFlow's donation escrows. Not a coin to trade: it has no purpose besides routing donations.",
+  description: "Holds Feeward's donation escrows. Not a coin to trade: it has no purpose besides routing donations.",
   imageDataUrl: image,
 });
 

@@ -6,7 +6,7 @@ import { db } from "./db.js";
 
 const app = await buildServer();
 await app.listen({ port: cfg.PORT, host: "0.0.0.0" });
-console.log(`FeeFlow on ${cfg.PUBLIC_URL} — routing authority ${authority.publicKey.toBase58()}`);
+console.log(`Feeward on ${cfg.PUBLIC_URL} — routing authority ${authority.publicKey.toBase58()}`);
 startWorker();
 
 // Redeploys stop the old instance with SIGTERM: close cleanly so it doesn't count as a crash.

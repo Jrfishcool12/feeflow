@@ -33,7 +33,7 @@ export default function Explore() {
     <div className="wrap" style={{ paddingBottom: 96 }}>
       <div className="page-head">
         <h1>Explore coins</h1>
-        <p className="sub">Every coin routing creator fees through FeeFlow. Direct coins were launched on FeeFlow; relayed coins were launched elsewhere and route through the FeeFlow treasury.</p>
+        <p className="sub">Every coin routing creator fees through Feeward. Direct coins were launched on Feeward; relayed coins were launched elsewhere and route through the Feeward treasury.</p>
       </div>
       <div className="toolbar">
         <input style={{ maxWidth: 340 }} value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search ticker, person, nonprofit or address" aria-label="Search coins" />

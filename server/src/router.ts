@@ -1,7 +1,7 @@
 /**
- * Client for the FeeFlow router program (../program).
+ * Client for the Feeward router program (../program).
  *
- * With the router on, every coin launched on FeeFlow has the router's `authority` PDA as
+ * With the router on, every coin launched on Feeward has the router's `authority` PDA as
  * its creator and fee-sharing admin. The program only ever writes the split
  * "nonprofit escrow / platform / buyback" with percentages fixed on-chain, and changing the
  * nonprofit needs a fresh attestation signed by this server after the honoree logs in.

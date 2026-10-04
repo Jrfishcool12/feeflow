@@ -1,5 +1,5 @@
 /**
- * Receipt-style card images (1200x630) for @FeeFlowApp posts and for share-link previews.
+ * Receipt-style card images (1200x630) for @feewardx posts and for share-link previews.
  *
  *   waiting: "$4,120  waiting for @elonmusk to give to any nonprofit"
  *   sent:    "$4,120  sent to Make-A-Wish America in @elonmusk's name"
@@ -13,17 +13,19 @@ import { getCharity, routingState, type Coin } from "./db.js";
 import { getHonoree } from "./market.js";
 
 const require = createRequire(import.meta.url);
-const font = (w: number) => readFileSync(require.resolve(`@fontsource/inter/files/inter-latin-${w}-normal.woff`));
-const FONTS = [400, 600, 800].map((weight) => ({ name: "Inter", data: font(weight), weight: weight as 400 | 600 | 800, style: "normal" as const }));
+const font = (w: number) => readFileSync(require.resolve(`@fontsource/manrope/files/manrope-latin-${w}-normal.woff`));
+const FONTS = [400, 600, 800].map((weight) => ({ name: "Manrope", data: font(weight), weight: weight as 400 | 600 | 800, style: "normal" as const }));
 
 // server/assets has a copy so the logo also works when only the server folder is deployed.
-const WORDMARK_PATH = ["./assets/feeflow-logo.svg", "../web/public/feeflow-logo.svg"].find((p) => existsSync(p)) ?? "";
-const wordmark = existsSync(WORDMARK_PATH)
-  ? `data:image/svg+xml;base64,${Buffer.from(readFileSync(WORDMARK_PATH, "utf8").replace(/currentColor/g, "#FBF9F5")).toString("base64")}`
-  : null;
+// The white-text Feeward logo (PNG), in server/assets so it works when only the server folder is deployed.
+const WORDMARK_PATH = ["./assets/feeward-logo-light.png", "../server/assets/feeward-logo-light.png"].find((p) => existsSync(p)) ?? "";
+const wordmarkPng = WORDMARK_PATH ? readFileSync(WORDMARK_PATH) : null;
+const wordmark = wordmarkPng ? `data:image/png;base64,${wordmarkPng.toString("base64")}` : null;
+const WM_H = 50;
+const WM_W = wordmarkPng ? Math.round((wordmarkPng.readUInt32BE(16) * WM_H) / wordmarkPng.readUInt32BE(20)) : 206;
 
-const GREEN = "#FC6C50";
-const MUTED = "#A39B8F";
+const GREEN = "#315bff";
+const MUTED = "#9aa0ae";
 
 /** Downloads an image for embedding. PNG and JPEG only (what the renderer decodes reliably). */
 async function embed(url: string | null): Promise<string | null> {
@@ -45,10 +47,10 @@ const h = (type: string, style: Record<string, unknown>, children?: unknown, ext
   props: { style: { display: "flex", ...style }, children, ...extra },
 });
 
-function circle(src: string | null, letter: string, size: number, ring = "#2E2B28"): El {
+function circle(src: string | null, letter: string, size: number, ring = "#2a2e3d"): El {
   return src
     ? h("img", { width: size, height: size, borderRadius: size / 2, border: `4px solid ${ring}`, objectFit: "cover" }, undefined, { src, width: size, height: size })
-    : h("div", { width: size, height: size, borderRadius: size / 2, background: "#2A2622", color: "#FC6C50", alignItems: "center", justifyContent: "center", fontSize: size * 0.42, fontWeight: 800 }, (letter.replace(/^[@$]/, "")[0] ?? "?").toUpperCase());
+    : h("div", { width: size, height: size, borderRadius: size / 2, background: "#232736", color: "#315bff", alignItems: "center", justifyContent: "center", fontSize: size * 0.42, fontWeight: 800 }, (letter.replace(/^[@$]/, "")[0] ?? "?").toUpperCase());
 }
 
 export type CardInput = {
@@ -64,7 +66,7 @@ export type CardInput = {
 
 export async function renderCard(c: CardInput): Promise<Buffer> {
   const [coinImg, avatarImg] = await Promise.all([embed(c.coinImage), embed(c.avatar)]);
-  const lines = [h("span", { color: "#FBF9F5" }, c.line1), h("span", { color: MUTED }, c.line2)];
+  const lines = [h("span", { color: "#f7f7f2" }, c.line1), h("span", { color: MUTED }, c.line2)];
   const host = cfg.PUBLIC_URL.replace(/^https?:\/\//, "").replace(/\/$/, "");
   const date = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" });
 
@@ -76,14 +78,14 @@ export async function renderCard(c: CardInput): Promise<Buffer> {
       flexDirection: "column",
       justifyContent: "space-between",
       padding: 64,
-      background: "#141312",
-      backgroundImage: "radial-gradient(circle at 88% 30%, rgba(252,108,80,0.22), rgba(20,19,18,0) 55%)",
-      fontFamily: "Inter",
-      color: "#FBF9F5",
+      background: "#12141d",
+      backgroundImage: "radial-gradient(circle at 88% 30%, rgba(49,91,255,0.22), rgba(18,20,29,0) 55%)",
+      fontFamily: "Manrope",
+      color: "#f7f7f2",
     },
     [
       h("div", { justifyContent: "space-between", alignItems: "center" }, [
-        wordmark ? h("img", { height: 50 }, undefined, { src: wordmark, height: 50, width: 210 }) : h("span", { fontSize: 40, fontWeight: 800 }, "FeeFlow"),
+        wordmark ? h("img", { height: 50 }, undefined, { src: wordmark, height: WM_H, width: WM_W }) : h("span", { fontSize: 40, fontWeight: 800 }, "Feeward"),
         h("span", { fontSize: 28, color: MUTED }, date),
       ]),
       h("div", { justifyContent: "space-between", alignItems: "center" }, [
@@ -123,7 +125,7 @@ export async function cardFor(c: Coin, kind: "waiting" | "sent", amount: string)
       return await renderCard({
         amount: `$${c.symbol}`,
         bigSize: c.symbol.length > 6 ? 84 : 112,
-        line1: chooser ? `tags @${chooser}` : "a new FeeFlow coin",
+        line1: chooser ? `tags @${chooser}` : "a new Feeward coin",
         line2: recipient ? `fees go to @${recipient}` : "who picks where its fees go",
         symbol: c.symbol,
         coinImage: c.image,

@@ -1,6 +1,6 @@
-# FeeFlow server
+# Feeward server
 
-The API and background worker behind [feeflow.io](https://feeflow.io): launches coins, collects creator fees, holds each coin's recipient share in the treasury, pays it out to the recipient's wallet or nonprofit, handles X login and @FeeFlowApp's posts and replies, and runs the FeeFlow coin buyback.
+The API and background worker behind [feeward.app](https://feeward.app): launches coins, collects creator fees, holds each coin's recipient share in the treasury, pays it out to the recipient's wallet or nonprofit, handles X login and @feewardx's posts and replies, and runs the Feeward coin buyback.
 
 How it works and how to verify it: [README](../README.md). How to run it: [DEPLOY.md](../DEPLOY.md).
 
@@ -12,7 +12,7 @@ How it works and how to verify it: [README](../README.md). How to run it: [DEPLO
 | `src/relay.ts` | Treasury: attributes each payment to its coin, holds the recipient share, pays out, fallback |
 | `src/pump.ts` | Pump.fun: launch transactions, fee sharing setup and checks, fee collection, buyback and burn |
 | `src/cards.ts` | Receipt card images for posts and link previews |
-| `src/posts.ts`, `src/x.ts` | @FeeFlowApp posting, X lookups and login |
+| `src/posts.ts`, `src/x.ts` | @feewardx posting, X lookups and login |
 | `src/db.ts` | SQLite schema and migrations |
 | `src/cli.ts` | `npm run charity`: manage the donate.gg nonprofit list |
 | `src/doctor.ts` | `npm run doctor`: checks the setup |

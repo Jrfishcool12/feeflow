@@ -57,7 +57,7 @@ export function RelayGuide({ initialMint = "" }: { initialMint?: string }) {
   if (info && !info.enabled) return <p className="notice">Coins launched elsewhere aren't supported on this server yet. Launch a new coin instead.</p>;
 
   const h = handle.trim().replace(/^@/, "") || "handle";
-  const line = `Fees to @${h} via FeeFlow`;
+  const line = `Fees to @${h} via Feeward`;
 
   return (
     <div className="guide">
@@ -67,7 +67,7 @@ export function RelayGuide({ initialMint = "" }: { initialMint?: string }) {
         <ol className="steps-num">
           <li>
             <span>
-              <b>Send 100% of creator fees to the FeeFlow treasury</b>
+              <b>Send 100% of creator fees to the Feeward treasury</b>
               On the coin's Pump.fun page, open fee sharing and add this address at 100%, with no other recipients.
             </span>
           </li>

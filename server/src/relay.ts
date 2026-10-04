@@ -1,10 +1,10 @@
 /**
- * Relayed coins: coins launched anywhere on Pump.fun that give through FeeFlow.
+ * Relayed coins: coins launched anywhere on Pump.fun that give through Feeward.
  *
- * A deployer sets the coin's fee sharing to 100% to the FeeFlow treasury, locks it, and puts
+ * A deployer sets the coin's fee sharing to 100% to the Feeward treasury, locks it, and puts
  * one line in the coin's description:
  *
- *     In honor of @handle via FeeFlow
+ *     In honor of @handle via Feeward
  *
  * (optionally followed by "for @nonprofit" to pick the starting nonprofit). Nothing else: the
  * indexer finds the coin on-chain and registers it. Fee payouts into the treasury are
@@ -26,9 +26,9 @@ const pump = new OnlinePumpSdk(conn);
 
 export { treasury };
 
-export const LINE_TEMPLATE = "Fees to @handle via FeeFlow";
-const LINE = /(?:fees to|for|in honor of|in the name of|giving in)\s+@([A-Za-z0-9_]{1,15})(?:'s name)?\s+via\s+(?:feeflow|goodcall)/i;
-const FOR = /via\s+(?:feeflow|goodcall)[^@\n]{0,20}\b(?:fallback|for)\s+@([A-Za-z0-9_]{1,15})/i;
+export const LINE_TEMPLATE = "Fees to @handle via Feeward";
+const LINE = /(?:fees to|for|in honor of|in the name of|giving in)\s+@([A-Za-z0-9_]{1,15})(?:'s name)?\s+via\s+(?:feeward|feeflow|goodcall)/i;
+const FOR = /via\s+(?:feeward|feeflow|goodcall)[^@\n]{0,20}\b(?:fallback|for)\s+@([A-Za-z0-9_]{1,15})/i;
 
 export function parseLine(description: string | null): { handle: string | null; nonprofitHandle: string | null } {
   if (!description) return { handle: null, nonprofitHandle: null };
@@ -68,7 +68,7 @@ export async function checkCoin(mintStr: string, via: "indexer" | "site"): Promi
 
   const existing = getCoin(mintStr);
   if (existing?.mode === "launch") {
-    steps.push({ key: "launched", ok: true, label: "Launched on FeeFlow", detail: "This coin gives directly; nothing to set up." });
+    steps.push({ key: "launched", ok: true, label: "Launched on Feeward", detail: "This coin gives directly; nothing to set up." });
     return done(existing.honoree_handle);
   }
 
@@ -90,7 +90,7 @@ export async function checkCoin(mintStr: string, via: "indexer" | "site"): Promi
   steps.push({
     key: "whole",
     ok: whole,
-    label: "100% of fees to the FeeFlow treasury",
+    label: "100% of fees to the Feeward treasury",
     detail: whole ? undefined : includes ? "The treasury gets only part of the fees. It has to be 100%, with no other recipients." : `Fees go elsewhere. Add ${t.toBase58()} at 100%.`,
   });
   const locked = !isSharingConfigEditable({ sharingConfig: sharing });

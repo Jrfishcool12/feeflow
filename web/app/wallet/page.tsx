@@ -3,18 +3,18 @@ import { useEffect, useState } from "react";
 import QRCode from "qrcode";
 import { post } from "@/lib/api";
 import { signBase64 } from "@/lib/wallet";
-import { sol, useBalance, useFeeFlowWallet } from "@/lib/feeflowWallet";
+import { sol, useBalance, useFeewardWallet } from "@/lib/feeflowWallet";
 import { solscanAccount, solscanTx } from "@/lib/format";
 
 export default function WalletPage() {
-  const w = useFeeFlowWallet();
+  const w = useFeewardWallet();
   const { lamports, refresh } = useBalance(w.address);
   const [qr, setQr] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (!w.address) return setQr(null);
-    QRCode.toDataURL(w.address, { margin: 1, width: 360, color: { dark: "#141312", light: "#fffdf8" } }).then(setQr, () => setQr(null));
+    QRCode.toDataURL(w.address, { margin: 1, width: 360, color: { dark: "#12141d", light: "#ffffff" } }).then(setQr, () => setQr(null));
   }, [w.address]);
 
   const copy = () => w.address && navigator.clipboard.writeText(w.address).then(() => (setCopied(true), setTimeout(() => setCopied(false), 1500)));
@@ -22,8 +22,8 @@ export default function WalletPage() {
   if (w.unavailable)
     return (
       <div className="wrap" style={{ paddingTop: 48, paddingBottom: 96, maxWidth: 720 }}>
-        <h1>Your FeeFlow wallet</h1>
-        <p className="sub">FeeFlow wallets couldn't load right now. Check that a browser extension isn't blocking privy.io, then reload. You can still launch with Phantom or another wallet.</p>
+        <h1>Your Feeward wallet</h1>
+        <p className="sub">Feeward wallets couldn't load right now. Check that a browser extension isn't blocking privy.io, then reload. You can still launch with Phantom or another wallet.</p>
       </div>
     );
 
@@ -37,14 +37,14 @@ export default function WalletPage() {
   if (!w.authenticated)
     return (
       <div className="wrap" style={{ paddingTop: 48, paddingBottom: 96, maxWidth: 720 }}>
-        <h1>Your FeeFlow wallet</h1>
+        <h1>Your Feeward wallet</h1>
         <p className="sub">
           Log in with X and a Solana wallet is created for you. Use it to launch coins and receive payouts without connecting Phantom or any other wallet extension.
         </p>
         <section className="panel" style={{ marginTop: 24 }}>
           <h2>Only you can use it</h2>
           <p className="muted">
-            FeeFlow never sees your wallet's key. Wallets are provided by Privy, and you can export the key to Phantom or any Solana wallet at any time.
+            Feeward never sees your wallet's key. Wallets are provided by Privy, and you can export the key to Phantom or any Solana wallet at any time.
           </p>
           <button className="btn btn-green" onClick={w.login}>
             Log in with X
@@ -55,8 +55,8 @@ export default function WalletPage() {
 
   return (
     <div className="wrap" style={{ paddingTop: 48, paddingBottom: 96, maxWidth: 880 }}>
-      <h1>{w.handle ? `@${w.handle}'s wallet` : "Your FeeFlow wallet"}</h1>
-      <p className="sub">Use it to launch coins and receive payouts. Only you can use it: FeeFlow never sees its key.</p>
+      <h1>{w.handle ? `@${w.handle}'s wallet` : "Your Feeward wallet"}</h1>
+      <p className="sub">Use it to launch coins and receive payouts. Only you can use it: Feeward never sees its key.</p>
 
       <div className="wallet-grid" style={{ marginTop: 24 }}>
         <section className="panel dark">
@@ -103,7 +103,7 @@ export default function WalletPage() {
       <section className="panel" style={{ marginTop: 20 }}>
         <h2>Your key</h2>
         <p className="muted">
-          Export your wallet's private key to use the same wallet in Phantom, Solflare or any Solana wallet. The key is shown in a secure window that FeeFlow can't read. Never share
+          Export your wallet's private key to use the same wallet in Phantom, Solflare or any Solana wallet. The key is shown in a secure window that Feeward can't read. Never share
           it with anyone.
         </p>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
@@ -119,7 +119,7 @@ export default function WalletPage() {
   );
 }
 
-function Withdraw({ from, provider, balance, onDone }: { from: string; provider: NonNullable<ReturnType<typeof useFeeFlowWallet>["provider"]>; balance: number | null; onDone: () => void }) {
+function Withdraw({ from, provider, balance, onDone }: { from: string; provider: NonNullable<ReturnType<typeof useFeewardWallet>["provider"]>; balance: number | null; onDone: () => void }) {
   const [to, setTo] = useState("");
   const [amount, setAmount] = useState("");
   const [busy, setBusy] = useState(false);

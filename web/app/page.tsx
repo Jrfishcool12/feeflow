@@ -122,17 +122,17 @@ export default function Home() {
               <span className="live" /> Live on Solana
             </span>
             <h1>
-              Fees for anyone on X. <em>They choose the recipient.</em>
+              Creator fees, <em>paid forward.</em>
             </h1>
             <p className="lead">
-              Launch a coin and tag any X account: @FeeFlowApp lets them know on X. They reply with who should receive its creator fees (themselves, a creator, a project, a cause or a nonprofit), the bot tags that account to claim it, and every payout is posted with a public receipt.
+              Launch a coin and tag any X account: @feewardx lets them know on X. They reply with who should receive its creator fees (themselves, a creator, a project, a cause or a nonprofit), the bot tags that account to claim it, and every payout is posted with a public receipt.
             </p>
             <div className="actions">
               <Link href="/launch" className="btn btn-white">
                 Launch a coin
               </Link>
               <Link href="/explore" className="btn btn-ghost">
-                Find coins you're tagged on
+                Find your tag
               </Link>
             </div>
           </div>
@@ -173,11 +173,11 @@ export default function Home() {
         <div className="wrap onx-grid">
           <div>
             <span className="eyebrow">Runs on X</span>
-            <h2 className="h2">@FeeFlowApp does the telling. A reply does the choosing.</h2>
+            <h2 className="h2">@feewardx does the telling. A reply does the choosing.</h2>
             <ol className="steps-num">
               <li>
                 <span>
-                  <b>Launch a coin and tag any X account</b>@FeeFlowApp tags them right away, so they know fees are waiting and that being tagged isn't an endorsement.
+                  <b>Launch a coin and tag any X account</b>@feewardx tags them right away, so they know fees are waiting and that being tagged isn't an endorsement.
                 </span>
               </li>
               <li>
@@ -194,7 +194,7 @@ export default function Home() {
               </li>
               <li>
                 <span>
-                  <b>Every payout is posted</b>@FeeFlowApp tags the recipient with a receipt card linking to the public transaction.
+                  <b>Every payout is posted</b>@feewardx tags the recipient with a receipt card linking to the public transaction.
                 </span>
               </li>
             </ol>
@@ -304,7 +304,7 @@ export default function Home() {
                     {"\n"}
                     <em>{pct(cfg?.charity_bps ?? 9000).padEnd(6)}</em> {String(cfg?.charity_bps ?? 9000).padEnd(5)} <b>recipient</b> <i>(wallet or nonprofit)</i>
                     {"\n"}
-                    <em>{pct(cfg?.platform_bps ?? 500).padEnd(6)}</em> {String(cfg?.platform_bps ?? 500).padEnd(5)} <b>FeeFlow</b>
+                    <em>{pct(cfg?.platform_bps ?? 500).padEnd(6)}</em> {String(cfg?.platform_bps ?? 500).padEnd(5)} <b>Feeward</b>
                     {"\n"}
                     <em>{pct(cfg?.buyback_bps ?? 500).padEnd(6)}</em> {String(cfg?.buyback_bps ?? 500).padEnd(5)} <b>buyback + burn</b>
                     {"\n\n"}

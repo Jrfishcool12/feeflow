@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { post, type Config } from "@/lib/api";
 import Link from "next/link";
 import { connectWallet, signBase64 } from "@/lib/wallet";
-import { sol, useBalance, useFeeFlowWallet } from "@/lib/feeflowWallet";
+import { sol, useBalance, useFeewardWallet } from "@/lib/feeflowWallet";
 
 /** Roughly what Pump.fun charges to create a coin (accounts and fees), before any dev buy. */
 const LAUNCH_COST = 20_000_000;
@@ -22,11 +22,11 @@ export function LaunchForm({ cfg }: { cfg: Config | null }) {
   const router = useRouter();
   const [step, setStep] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
-  // Default: the user's FeeFlow wallet (log in with X). Phantom and other extensions stay available.
+  // Default: the user's Feeward wallet (log in with X). Phantom and other extensions stay available.
   const [external, setExternal] = useState(false);
-  const ffw = useFeeFlowWallet();
+  const ffw = useFeewardWallet();
   const { lamports, refresh } = useBalance(external ? null : ffw.address);
-  // FeeFlow wallets unavailable (Privy didn't load): fall back to wallet extensions.
+  // Feeward wallets unavailable (Privy didn't load): fall back to wallet extensions.
   useEffect(() => {
     if (ffw.unavailable) setExternal(true);
   }, [ffw.unavailable]);
@@ -39,10 +39,10 @@ export function LaunchForm({ cfg }: { cfg: Config | null }) {
     try {
       setStep(external ? "Connecting wallet…" : "Preparing…");
       const own = !external && ffw.provider && ffw.address ? { provider: ffw.provider, address: ffw.address } : null;
-      if (!external && !own) throw new Error("Your FeeFlow wallet is still being set up. Try again in a moment.");
+      if (!external && !own) throw new Error("Your Feeward wallet is still being set up. Try again in a moment.");
       if (own && lamports !== null) {
         const need = LAUNCH_COST + Math.round(Number(f.get("dev_buy_sol") || 0) * 1e9);
-        if (lamports < need) throw new Error(`Your FeeFlow wallet has ${sol(lamports)}. Launching needs about ${sol(need)} (about 0.02 SOL plus your dev buy). Add SOL on your wallet page.`);
+        if (lamports < need) throw new Error(`Your Feeward wallet has ${sol(lamports)}. Launching needs about ${sol(need)} (about 0.02 SOL plus your dev buy). Add SOL on your wallet page.`);
       }
       const { provider, address } = own ?? (await connectWallet());
       const body: Record<string, unknown> = {
@@ -65,7 +65,7 @@ export function LaunchForm({ cfg }: { cfg: Config | null }) {
 
       setStep("Preparing your coin…");
       const built = await post<{ mint: string; tx: string }>("/api/launch/build", body);
-      setStep(own ? "Signing with your FeeFlow wallet…" : "Approve in your wallet…");
+      setStep(own ? "Signing with your Feeward wallet…" : "Approve in your wallet…");
       const tx = await signBase64(provider, built.tx);
       setStep("Launching…");
       await post("/api/launch/submit", { mint: built.mint, tx });
@@ -132,7 +132,7 @@ export function LaunchForm({ cfg }: { cfg: Config | null }) {
       <div>
         {!external && ffw.authenticated && ffw.address && (
           <p className="muted small" style={{ margin: "0 0 12px" }}>
-            Launching from your FeeFlow wallet <span className="mono">{ffw.address.slice(0, 4)}…{ffw.address.slice(-4)}</span>, which holds {sol(lamports)}. Launching costs about 0.02
+            Launching from your Feeward wallet <span className="mono">{ffw.address.slice(0, 4)}…{ffw.address.slice(-4)}</span>, which holds {sol(lamports)}. Launching costs about 0.02
             SOL plus any dev buy. <Link href="/wallet">Add SOL</Link>{" "}
             <button type="button" className="btn-link" onClick={refresh}>
               Refresh
@@ -144,12 +144,12 @@ export function LaunchForm({ cfg }: { cfg: Config | null }) {
             {step ?? (external ? "Connect wallet and launch" : ffw.authenticated ? "Launch" : "Log in with X to launch")}
           </button>
           <button type="button" className="btn-link" onClick={() => (setExternal(!external), setErr(null))}>
-            {external ? "Use my FeeFlow wallet instead" : "Use Phantom or another wallet instead"}
+            {external ? "Use my Feeward wallet instead" : "Use Phantom or another wallet instead"}
           </button>
         </div>
         {!external && !ffw.authenticated && (
           <p className="muted small" style={{ marginTop: 10 }}>
-            No wallet extension needed: logging in with X creates a FeeFlow wallet that only you can use.
+            No wallet extension needed: logging in with X creates a Feeward wallet that only you can use.
           </p>
         )}
         {err && <p className="err" role="status">{err}</p>}

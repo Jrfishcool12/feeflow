@@ -1,6 +1,6 @@
-# Deploying FeeFlow
+# Deploying Feeward
 
-FeeFlow is two parts: the **server** (API + background worker, with a SQLite database) and the **web** site (Next.js), which proxies `/api` and `/auth` to the server.
+Feeward is two parts: the **server** (API + background worker, with a SQLite database) and the **web** site (Next.js), which proxies `/api` and `/auth` to the server.
 
 ## 1. Server
 
@@ -23,11 +23,11 @@ Key settings:
 | `AUTHORITY_SECRET_KEY` | Server wallet: launches coins and sets their fee sharing. Keep it funded with a little SOL. |
 | `MASTER_SEED` | Derives the treasury key. **Back it up with the database**: losing it loses the treasury. |
 | `PLATFORM_WALLET` | Receives the 5% platform share. |
-| `PLATFORM_COIN_MINT` | The FeeFlow coin, bought back and burned with the 5% buyback share. |
+| `PLATFORM_COIN_MINT` | The Feeward coin, bought back and burned with the 5% buyback share. |
 | `FALLBACK_CONFIG_ID` | donate.gg config of the fallback nonprofit. |
 | `HOLD_DAYS` | Days a recipient has to set a payout destination before the fallback applies (default 90). |
 | `X_*` | X API keys: bearer token (lookups), OAuth 2.0 client (login), and the bot account's OAuth 1.0a tokens (posting, reading replies). Run `node xauth.cjs start` to authorize the bot account. |
-| `PUBLIC_URL` | The website's address, e.g. `https://feeflow.io`. |
+| `PUBLIC_URL` | The website's address, e.g. `https://feeward.app`. |
 
 The included `Dockerfile` runs on Railway, Fly or any container host. Mount a volume at `/data` (the database lives at `/data/goodcall.db`).
 

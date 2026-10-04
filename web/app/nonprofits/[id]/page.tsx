@@ -26,7 +26,7 @@ export default function NonprofitPage({ params }: { params: Promise<{ id: string
       </div>
       <div className="stats" style={{ gridTemplateColumns: "repeat(2, 1fr)" }}>
         <div className="stat-tile dark">
-          <small>Received through FeeFlow</small>
+          <small>Received through Feeward</small>
           <b>{money(n.received_lamports, data.sol_usd)}</b>
         </div>
         <div className="stat-tile mint">

@@ -21,7 +21,7 @@ export type Coin = {
   recipient_selected_at: number | null;
   recipient_selected_via: "site" | "x_reply" | "migrated" | null;
   selection_tweet: string | null;
-  /** @FeeFlowApp's post about this coin; the chooser can reply to it with the recipient's @handle. */
+  /** @feewardx's post about this coin; the chooser can reply to it with the recipient's @handle. */
   announce_tweet: string | null;
   recipient_declined_at: number | null;
   state: RoutingState;

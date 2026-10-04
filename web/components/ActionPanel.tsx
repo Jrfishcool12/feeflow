@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { api, post, type CoinDetail, type Config } from "@/lib/api";
 import { connectWallet, signText } from "@/lib/wallet";
 import { dateLong } from "@/lib/roles";
-import { useFeeFlowWallet } from "@/lib/feeflowWallet";
+import { useFeewardWallet } from "@/lib/feeflowWallet";
 import { NonprofitPicker } from "./NonprofitPicker";
 import { Avatar } from "./Avatar";
 
@@ -11,7 +11,7 @@ type Msg = { ok: boolean; text: string } | null;
 type Lookup = { found: boolean; handle: string; name: string | null; avatar: string | null };
 
 const login = (mint: string) => `/auth/x/start?mint=${encodeURIComponent(mint)}`;
-const onX = (id: string) => `https://x.com/FeeFlowApp/status/${id}`;
+const onX = (id: string) => `https://x.com/feewardx/status/${id}`;
 
 /** What the chooser and the recipient do on a coin's page. Shows nothing to everyone else once routing is set. */
 export function ActionPanel({ d, cfg, onChanged }: { d: CoinDetail; cfg: Config | null; onChanged: () => void }) {
@@ -26,7 +26,7 @@ export function ActionPanel({ d, cfg, onChanged }: { d: CoinDetail; cfg: Config 
         <h2>{c.honoree ? `Are you @${c.honoree}?` : "Were you tagged on this coin?"}</h2>
         <p className="muted">
           This coin tags {c.honoree ? `@${c.honoree}` : "an X account"}, who chooses who receives its creator fees: themselves, a creator, a project, a cause or a
-          nonprofit. @FeeFlowApp tagged them on X: they can reply to that post with one @handle (or "me"), or log in here to choose. Being tagged doesn't mean they endorsed the
+          nonprofit. @feewardx tagged them on X: they can reply to that post with one @handle (or "me"), or log in here to choose. Being tagged doesn't mean they endorsed the
           coin.
         </p>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
@@ -143,7 +143,7 @@ function ChooseRecipient({ d, fallback, deadline, onChanged }: { d: CoinDetail; 
         {deadline ? ` If no payout destination is set by ${deadline}, funds go to ${fallback}.` : ""}
       </p>
       <p className="muted small">
-        Or do it on X: reply to @FeeFlowApp's post about this coin with the account's @handle, or "me".
+        Or do it on X: reply to @feewardx's post about this coin with the account's @handle, or "me".
         {c.announce_tweet ? (
           <>
             {" "}
@@ -198,7 +198,7 @@ function SetPayout({ d, cfg, fallback, deadline, onChanged }: { d: CoinDetail; c
   const [wallet, setWallet] = useState<{ provider: Awaited<ReturnType<typeof connectWallet>>["provider"]; address: string } | null>(null);
   const [nonprofit, setNonprofit] = useState<string | null>(null);
   const [declining, setDeclining] = useState(false);
-  const ffw = useFeeFlowWallet();
+  const ffw = useFeewardWallet();
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<Msg>(null);
 
@@ -265,11 +265,11 @@ function SetPayout({ d, cfg, fallback, deadline, onChanged }: { d: CoinDetail; c
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
               {ffw.authenticated && ffw.address && ffw.provider ? (
                 <button className="btn btn-white" disabled={busy} onClick={() => setWallet({ provider: ffw.provider!, address: ffw.address! })}>
-                  Use my FeeFlow wallet
+                  Use my Feeward wallet
                 </button>
               ) : (
                 <button className="btn btn-white" disabled={busy || !ffw.ready} onClick={ffw.login}>
-                  Create a FeeFlow wallet
+                  Create a Feeward wallet
                 </button>
               )}
               <button className="btn btn-ghost" disabled={busy} onClick={() => connectWallet().then(setWallet, (e: Error) => setMsg({ ok: false, text: e.message }))}>
@@ -290,7 +290,7 @@ function SetPayout({ d, cfg, fallback, deadline, onChanged }: { d: CoinDetail; c
         <div>
           <p className="muted small">
             Funds are donated through donate.gg to the nonprofit you pick. donate.gg delivers the donation and charges its own processing fee, so the nonprofit receives a bit
-            less than the recipient share. The list is donate.gg's; FeeFlow doesn't separately verify these organizations.
+            less than the recipient share. The list is donate.gg's; Feeward doesn't separately verify these organizations.
           </p>
           <NonprofitPicker value={nonprofit} onChange={setNonprofit} />
           <button className="btn btn-green" style={{ marginTop: 14 }} disabled={busy || !nonprofit || !sure} onClick={useNonprofit}>
@@ -300,7 +300,7 @@ function SetPayout({ d, cfg, fallback, deadline, onChanged }: { d: CoinDetail; c
       )}
 
       {(
-        <div style={{ marginTop: 20, borderTop: "1px solid var(--ink-line, #2e2b28)", paddingTop: 14 }}>
+        <div style={{ marginTop: 20, borderTop: "1px solid var(--ink-line, #2a2e3d)", paddingTop: 14 }}>
           {!declining ? (
             <button className="btn btn-ghost btn-sm" onClick={() => setDeclining(true)}>
               Decline
@@ -364,8 +364,8 @@ function PassOn({ d, onChanged }: { d: CoinDetail; onChanged: () => void }) {
   return (
     <div>
       <p className="muted small">
-        Pass ${c.symbol}'s fees to another X account instead: a friend, a project, a cause or a charity's account. @FeeFlowApp tags them, and they can accept, choose where
-        funds go, or pass it on again. You can also do this by replying to @FeeFlowApp with their @handle.
+        Pass ${c.symbol}'s fees to another X account instead: a friend, a project, a cause or a charity's account. @feewardx tags them, and they can accept, choose where
+        funds go, or pass it on again. You can also do this by replying to @feewardx with their @handle.
       </p>
       <input value={handle} onChange={(e) => setHandle(e.target.value)} placeholder="@handle" aria-label="X handle to pass it to" autoComplete="off" />
       {looking && <p className="muted small" style={{ marginTop: 10 }}>Looking up @{clean}…</p>}

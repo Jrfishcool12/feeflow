@@ -5,8 +5,8 @@ import { pct } from "@/lib/format";
 export function SplitBar({ cfg }: { cfg: Pick<Config, "charity_bps" | "platform_bps" | "buyback_bps"> }) {
   const parts = [
     { key: "charity", bps: cfg.charity_bps, label: "to the recipient's wallet or nonprofit", color: "var(--green)" },
-    { key: "platform", bps: cfg.platform_bps, label: "to FeeFlow", color: "var(--split-platform)" },
-    { key: "buyback", bps: cfg.buyback_bps, label: "FeeFlow coin buyback and burn", color: "var(--split-buyback)" },
+    { key: "platform", bps: cfg.platform_bps, label: "to Feeward", color: "var(--split-platform)" },
+    { key: "buyback", bps: cfg.buyback_bps, label: "Feeward coin buyback and burn", color: "var(--split-buyback)" },
   ].filter((p) => p.bps > 0);
   return (
     <>

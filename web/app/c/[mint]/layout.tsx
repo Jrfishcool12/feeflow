@@ -5,7 +5,7 @@ export async function generateMetadata({ params }: { params: Promise<{ mint: str
   const { mint } = await params;
   const site = (process.env.SITE_URL ?? "http://localhost:3000").replace(/\/$/, "");
   let image = `${site}/api/cards/${mint}.png`;
-  let title = "FeeFlow";
+  let title = "Feeward";
   try {
     const r = await fetch(`${process.env.BACKEND_URL ?? "http://localhost:8787"}/api/coins/${mint}`, { next: { revalidate: 300 } });
     if (r.ok) {

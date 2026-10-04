@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Wordmark } from "./Wordmark";
 import { useApi, type Config } from "@/lib/api";
-import { sol, useBalance, useFeeFlowWallet } from "@/lib/feeflowWallet";
+import { sol, useBalance, useFeewardWallet } from "@/lib/feeflowWallet";
 
 const P: Record<string, React.ReactNode> = {
   home: <path d="M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3z" />,
@@ -66,11 +66,11 @@ export function Sidebar() {
   const path = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const cfg = useApi<Config>("/api/config").data;
-  const ffw = useFeeFlowWallet();
+  const ffw = useFeewardWallet();
   const { lamports } = useBalance(ffw.address);
   const [copied, setCopied] = useState(false);
   const ca = cfg?.platform_coin ?? null;
-  const ticker = cfg?.platform_coin_symbol ? `$${cfg.platform_coin_symbol}` : "FeeFlow coin";
+  const ticker = cfg?.platform_coin_symbol ? `$${cfg.platform_coin_symbol}` : "Feeward coin";
   const copyCa = () => ca && navigator.clipboard.writeText(ca).then(() => (setCopied(true), setTimeout(() => setCopied(false), 1500)));
   const [open, setOpen] = useState(false);
 
@@ -108,7 +108,7 @@ export function Sidebar() {
         <button className="sb-icon-btn" onClick={() => setOpen(true)} aria-label="Open menu">
           <Icon name="menu" />
         </button>
-        <Link href="/" className="mbar-brand" aria-label="FeeFlow home">
+        <Link href="/" className="mbar-brand" aria-label="Feeward home">
           <Wordmark />
         </Link>
         <Link href="/launch" className="btn btn-sm btn-white">
@@ -118,9 +118,9 @@ export function Sidebar() {
       {open && <div className="sb-scrim" onClick={() => setOpen(false)} />}
       <aside className={`sidebar${open ? " open" : ""}`} aria-label="Main">
         <div className="sb-top">
-          <Link href="/" className="sb-brand" aria-label="FeeFlow home">
+          <Link href="/" className="sb-brand" aria-label="Feeward home">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/icon.svg" alt="" className="ic" width={28} height={28} />
+            <img src="/feeward-icon.png" alt="" className="ic" width={28} height={28} />
             <span className="wm">
               <Wordmark />
             </span>
@@ -177,9 +177,9 @@ export function Sidebar() {
           <Icon name="launch" />
           <span className="sb-label">Launch a coin</span>
         </Link>
-        <a href="https://x.com/FeeFlowApp" target="_blank" rel="noopener" className="sb-link" title={collapsed ? "@FeeFlowApp on X" : undefined}>
+        <a href="https://x.com/feewardx" target="_blank" rel="noopener" className="sb-link" title={collapsed ? "@feewardx on X" : undefined}>
           <Icon name="x" />
-          <span className="sb-label mono">@FeeFlowApp</span>
+          <span className="sb-label mono">@feewardx</span>
         </a>
       </aside>
     </>

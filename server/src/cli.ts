@@ -51,7 +51,7 @@ async function lookup(configId: string): Promise<DonateConfig | null> {
 /** Why a config shouldn't be used, or null if it's fine. */
 function problems(c: DonateConfig): string[] {
   const out: string[] = [];
-  if (c.charities.length !== 1) out.push(`pays ${c.charities.length} nonprofits (FeeFlow lists single-nonprofit configs)`);
+  if (c.charities.length !== 1) out.push(`pays ${c.charities.length} nonprofits (Feeward lists single-nonprofit configs)`);
   for (const ch of c.charities) {
     if (!ch.isEnabled) out.push(`${ch.name} is disabled on donate.gg`);
     if (ch.status === "OPTED_OUT" || ch.status === "PLATFORM_DISABLED" || ch.status === "SOFT_HIDDEN") out.push(`${ch.name} status is ${ch.status}`);

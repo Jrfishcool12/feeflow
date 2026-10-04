@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 
 /**
- * A coin's X link (set in its metadata at launch): @FeeFlowApp's post about the coin. The post is made a
- * few seconds after launch, so until it exists this goes to @FeeFlowApp.
+ * A coin's X link (set in its metadata at launch): @feewardx's post about the coin. The post is made a
+ * few seconds after launch, so until it exists this goes to @feewardx.
  */
 export async function GET(_req: Request, { params }: { params: Promise<{ mint: string }> }) {
   const { mint } = await params;
@@ -13,5 +13,5 @@ export async function GET(_req: Request, { params }: { params: Promise<{ mint: s
   } catch {
     /* backend down: fall back to the profile */
   }
-  return NextResponse.redirect(tweet ? `https://x.com/FeeFlowApp/status/${tweet}` : "https://x.com/FeeFlowApp", 302);
+  return NextResponse.redirect(tweet ? `https://x.com/feewardx/status/${tweet}` : "https://x.com/feewardx", 302);
 }
